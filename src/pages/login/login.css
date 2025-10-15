@@ -1,0 +1,55 @@
+body {
+    font-family: 'Pretendard', sans-serif;
+    background-color: #f6f6f8;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+.login-button {
+    width: 320px;
+    background-color: #a78bfa;
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background-color 0.2s;
+}
+
+.login-button:hover {
+    background-color: #8b5cf6;
+}
+
+.signup-button {
+    margin-top: 12px;
+    border: none;
+    background: transparent;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 6px 14px;
+    transition: background-color 0.2s;
+}
+
+.signup-button:hover {
+    background-color: #f0f0f0;
+}
