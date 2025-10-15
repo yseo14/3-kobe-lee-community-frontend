@@ -1,5 +1,5 @@
 import InputField from "../../components/input-field/InputField.js";
-import { renderPage, HomePage } from "../../main.js";
+import { renderPage } from "../../main.js";
 
 export default function LoginPage() {
   const container = document.createElement("div");
@@ -9,6 +9,7 @@ export default function LoginPage() {
   title.textContent = "로그인";
   container.appendChild(title);
 
+  // 이메일 필드
   const emailField = new InputField({
     id: "email",
     label: "이메일",
@@ -18,6 +19,7 @@ export default function LoginPage() {
   });
   container.appendChild(emailField.render());
 
+  // 비밀번호 필드
   const passwordField = new InputField({
     id: "password",
     label: "비밀번호",
@@ -27,16 +29,19 @@ export default function LoginPage() {
   });
   container.appendChild(passwordField.render());
 
+  // 로그인 버튼
   const loginButton = document.createElement("button");
   loginButton.className = "login-button";
   loginButton.textContent = "로그인";
   container.appendChild(loginButton);
 
+  // 회원가입 버튼
   const signupButton = document.createElement("button");
   signupButton.className = "signup-button";
   signupButton.textContent = "회원가입";
   container.appendChild(signupButton);
 
+  // 로그인 버튼 클릭 이벤트
   loginButton.addEventListener("click", (e) => {
     e.preventDefault();
     const email = document.getElementById("email").value.trim();
@@ -57,7 +62,8 @@ export default function LoginPage() {
     emailField.hideHelper();
     passwordField.hideHelper();
 
-    renderPage(HomePage);
+    // 로그인 성공 시 다음 페이지로 이동
+    // renderPage(HomePage);
   });
 
   return container;

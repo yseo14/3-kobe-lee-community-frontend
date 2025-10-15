@@ -1,13 +1,25 @@
+import Header from "./components/header/Header.js";
 import LoginPage from "./pages/login/LoginPage.js";
-import HomePage from "./pages/home/HomePage.js";
 
 const root = document.querySelector("#root");
 
+const layout = document.createElement("div");
+layout.className = "layout";
+
+const header = Header({ title: "아무 말 대잔치" });
+layout.appendChild(header);
+
+const content = document.createElement("div");
+content.id = "content";
+layout.appendChild(content);
+
+root.appendChild(layout);
+
 function renderPage(pageComponent) {
-  root.innerHTML = "";
-  root.appendChild(pageComponent());
+  content.innerHTML = "";
+  content.appendChild(pageComponent());
 }
 
 renderPage(LoginPage);
 
-export { renderPage, HomePage };
+export { renderPage };
