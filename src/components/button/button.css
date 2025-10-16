@@ -1,0 +1,42 @@
+.button {
+    background-color: #a78bfa;
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background-color 0.2s;
+}
+
+.button:hover {
+    background-color: #8b5cf6;
+}
+
+/* Secondary: 연보라 버튼 */
+.button.secondary {
+    background-color: #f3e8ff;
+    color: #6b21a8;
+}
+
+.button.secondary:hover {
+    background-color: #e9d5ff;
+}
+
+/* ✅ Text형 버튼 (회원가입 버튼처럼) */
+.button.text {
+    background: transparent;
+    color: #333;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    transition: background-color 0.2s;
+    width: auto;
+}
+
+.button.text:hover {
+    background-color: #f0f0f0;
+}
