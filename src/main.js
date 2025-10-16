@@ -1,5 +1,7 @@
 import Header from "./components/header/Header.js";
 import LoginPage from "./pages/login/LoginPage.js";
+import SignupPage from "./pages/signup/SignupPage.js";
+import ProfileUpload from "./components/profile-upload/ProfileUpload.js";
 
 const root = document.querySelector("#root");
 
@@ -20,6 +22,7 @@ function renderPage(pageComponent) {
   content.appendChild(pageComponent());
 }
 
-renderPage(LoginPage);
+// renderPage(LoginPage);
+renderPage(SignupPage);
 
 export { renderPage };

@@ -1,4 +1,6 @@
 import InputField from "../../components/input-field/InputField.js";
+import Button from "../../components/button/Button.js";
+import SignupPage from "../signup/SignupPage.js";
 import { renderPage } from "../../main.js";
 
 export default function LoginPage() {
@@ -29,17 +31,23 @@ export default function LoginPage() {
   });
   container.appendChild(passwordField.render());
 
-  // 로그인 버튼
-  const loginButton = document.createElement("button");
-  loginButton.className = "login-button";
-  loginButton.textContent = "로그인";
-  container.appendChild(loginButton);
+  const loginButton = new Button({
+    text: "로그인",
+    className: "primary",
+    onClick: (e) => {
+      e.preventDefault();
+      console.log("로그인 시도");
+    },
+  });
+  container.appendChild(loginButton.render());
 
-  // 회원가입 버튼
-  const signupButton = document.createElement("button");
-  signupButton.className = "signup-button";
-  signupButton.textContent = "회원가입";
-  container.appendChild(signupButton);
+  const signupButton = new Button({
+    text: "회원가입",
+    className: "text",
+    width: "auto",
+    onClick: () => renderPage(SignupPage),
+  });
+  container.appendChild(signupButton.render());
 
   // 로그인 버튼 클릭 이벤트
   loginButton.addEventListener("click", (e) => {
