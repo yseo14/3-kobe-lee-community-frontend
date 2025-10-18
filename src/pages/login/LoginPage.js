@@ -36,9 +36,28 @@ export default function LoginPage() {
     className: "primary",
     onClick: (e) => {
       e.preventDefault();
-      console.log("로그인 시도");
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!email) {
+        emailField.showHelper("이메일을 입력하세요.");
+        passwordField.hideHelper();
+        return;
+      }
+
+      if (!password) {
+        passwordField.showHelper("비밀번호를 입력하세요.");
+        emailField.hideHelper();
+        return;
+      }
+
+      emailField.hideHelper();
+      passwordField.hideHelper();
+
+      console.log("로그인 시도 성공");
     },
   });
+
   container.appendChild(loginButton.render());
 
   const signupButton = new Button({
@@ -48,31 +67,6 @@ export default function LoginPage() {
     onClick: () => renderPage(SignupPage),
   });
   container.appendChild(signupButton.render());
-
-  // 로그인 버튼 클릭 이벤트
-  loginButton.addEventListener("click", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    if (!email) {
-      emailField.showHelper("이메일을 입력하세요.");
-      passwordField.hideHelper();
-      return;
-    }
-
-    if (!password) {
-      passwordField.showHelper("비밀번호를 입력하세요.");
-      emailField.hideHelper();
-      return;
-    }
-
-    emailField.hideHelper();
-    passwordField.hideHelper();
-
-    // 로그인 성공 시 다음 페이지로 이동
-    // renderPage(HomePage);
-  });
 
   return container;
 }
