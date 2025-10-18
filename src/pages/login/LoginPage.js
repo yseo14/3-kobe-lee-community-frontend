@@ -34,6 +34,7 @@ export default function LoginPage() {
   const loginButton = new Button({
     text: "로그인",
     className: "primary",
+    width: "320px",
     onClick: (e) => {
       e.preventDefault();
       const email = document.getElementById("email").value.trim();
