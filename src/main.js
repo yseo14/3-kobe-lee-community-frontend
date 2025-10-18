@@ -22,7 +22,6 @@ function renderPage(pageComponent) {
   content.appendChild(pageComponent());
 }
 
-// renderPage(LoginPage);
-renderPage(SignupPage);
+renderPage(LoginPage);
 
 export { renderPage };
