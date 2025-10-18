@@ -38,7 +38,7 @@ export default function SignupPage() {
 
   // 비밀번호 확인 필드
   const passwordConfirmField = new InputField({
-    id: "password",
+    id: "passwordConfirm",
     label: "비밀번호 확인*",
     type: "password",
     placeholder: "비밀번호를 한번 더 입력하세요",
