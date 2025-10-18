@@ -65,7 +65,7 @@ export default function LoginPage() {
     text: "회원가입",
     className: "text",
     width: "auto",
-    onClick: () => renderPage(SignupPage),
+    onClick: () => renderPage(SignupPage,  { showBack: true, showProfile: false }),
   });
   container.appendChild(signupButton.render());
 

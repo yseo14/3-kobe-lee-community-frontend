@@ -59,6 +59,7 @@ export default function SignupPage() {
   const signupButton = new Button({
     text: "회원가입",
     className: "primary",
+    width: "320px",
     onClick: (e) => {
       e.preventDefault();
       console.log("회원가입 시도");
