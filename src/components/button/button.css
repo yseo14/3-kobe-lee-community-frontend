@@ -1,0 +1,61 @@
+/* 공통 버튼 스타일 초기화 */
+.button {
+    all: unset;
+    /* 기본 버튼 스타일 제거 */
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: "Pretendard", sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+/* 🔹 프라이머리 버튼 */
+.button.primary {
+    background-color: #a78bfa;
+    color: white;
+    padding: 10px 16px;
+    height: 48px;
+    width: 100%;
+    max-width: 320px;
+}
+
+.button.primary:hover {
+    background-color: #8b5cf6;
+}
+
+/* 🔹 텍스트 버튼 */
+.button.text {
+    background: transparent;
+    color: #333;
+    padding: 8px 12px;
+}
+
+.button.text:hover {
+    background-color: #f0f0f0;
+}
+
+/* 🔹 아이콘 버튼 */
+.button.icon {
+    background: transparent;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    padding: 0;
+}
+
+.button.icon:hover {
+    background-color: #e9e9ec;
+}
+
+/* 아이콘 이미지 */
+.button-icon {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+    display: block;
+}

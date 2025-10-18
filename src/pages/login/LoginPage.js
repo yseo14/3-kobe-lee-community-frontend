@@ -1,5 +1,7 @@
 import InputField from "../../components/input-field/InputField.js";
-import { renderPage, HomePage } from "../../main.js";
+import Button from "../../components/button/Button.js";
+import SignupPage from "../signup/SignupPage.js";
+import { renderPage } from "../../main.js";
 
 export default function LoginPage() {
   const container = document.createElement("div");
@@ -9,6 +11,7 @@ export default function LoginPage() {
   title.textContent = "로그인";
   container.appendChild(title);
 
+  // 이메일 필드
   const emailField = new InputField({
     id: "email",
     label: "이메일",
@@ -18,6 +21,7 @@ export default function LoginPage() {
   });
   container.appendChild(emailField.render());
 
+  // 비밀번호 필드
   const passwordField = new InputField({
     id: "password",
     label: "비밀번호",
@@ -27,38 +31,43 @@ export default function LoginPage() {
   });
   container.appendChild(passwordField.render());
 
-  const loginButton = document.createElement("button");
-  loginButton.className = "login-button";
-  loginButton.textContent = "로그인";
-  container.appendChild(loginButton);
+  const loginButton = new Button({
+    text: "로그인",
+    className: "primary",
+    width: "320px",
+    onClick: (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
 
-  const signupButton = document.createElement("button");
-  signupButton.className = "signup-button";
-  signupButton.textContent = "회원가입";
-  container.appendChild(signupButton);
+      if (!email) {
+        emailField.showHelper("이메일을 입력하세요.");
+        passwordField.hideHelper();
+        return;
+      }
 
-  loginButton.addEventListener("click", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
+      if (!password) {
+        passwordField.showHelper("비밀번호를 입력하세요.");
+        emailField.hideHelper();
+        return;
+      }
 
-    if (!email) {
-      emailField.showHelper("이메일을 입력하세요.");
-      passwordField.hideHelper();
-      return;
-    }
-
-    if (!password) {
-      passwordField.showHelper("비밀번호를 입력하세요.");
       emailField.hideHelper();
-      return;
-    }
+      passwordField.hideHelper();
 
-    emailField.hideHelper();
-    passwordField.hideHelper();
-
-    renderPage(HomePage);
+      console.log("로그인 시도 성공");
+    },
   });
+
+  container.appendChild(loginButton.render());
+
+  const signupButton = new Button({
+    text: "회원가입",
+    className: "text",
+    width: "auto",
+    onClick: () => renderPage(SignupPage,  { showBack: true, showProfile: false }),
+  });
+  container.appendChild(signupButton.render());
 
   return container;
 }
