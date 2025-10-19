@@ -1,7 +1,7 @@
 import InputField from "../../components/input-field/InputField.js";
 import Button from "../../components/button/Button.js";
-import SignupPage from "../signup/SignupPage.js";
-import { renderPage } from "../../main.js";
+
+import { navigate } from "../../main.js";
 
 export default function LoginPage() {
   const container = document.createElement("div");
@@ -55,7 +55,7 @@ export default function LoginPage() {
       emailField.hideHelper();
       passwordField.hideHelper();
 
-      console.log("로그인 시도 성공");
+      navigate("/posts");
     },
   });
 
@@ -65,7 +65,7 @@ export default function LoginPage() {
     text: "회원가입",
     className: "text",
     width: "auto",
-    onClick: () => renderPage(SignupPage,  { showBack: true, showProfile: false }),
+    onClick: () => navigate("/signup"),
   });
   container.appendChild(signupButton.render());
 

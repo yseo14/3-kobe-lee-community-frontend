@@ -1,7 +1,7 @@
 import InputField from "../../components/input-field/InputField.js";
 import ProfileUpload from "../../components/profile-upload/ProfileUpload.js";
 import Button from "../../components/button/Button.js";
-import { renderPage } from "../../main.js";
+import { navigate } from "../../main.js";
 
 export default function SignupPage() {
   const container = document.createElement("div");
@@ -72,7 +72,7 @@ export default function SignupPage() {
     text: "로그인하러 가기",
     className: "text",
     width: "auto",
-    onClick: () => renderPage(SignupPage),
+    onClick: () => navigate("/login"),
   });
   container.appendChild(goLogin.render());
 

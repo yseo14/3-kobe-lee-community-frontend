@@ -1,5 +1,7 @@
 import Header from "./components/header/Header.js";
 import LoginPage from "./pages/login/LoginPage.js";
+import SignupPage from './pages/signup/SignupPage.js';
+import PostListPage from './pages/post-list/PostListPage.js';
 
 const root = document.querySelector("#root");
 
@@ -28,6 +30,31 @@ function renderPage(pageComponent, headerOptions = {}) {
   content.appendChild(pageComponent());
 }
 
-renderPage(LoginPage, { showBack: false, showProfile: false });
+function handleRouting() {
+  const path = window.location.hash.replace("#", ""); // 예: #/signup → /signup
+
+  switch (path) {
+    case "/signup":
+      renderPage(SignupPage, { showBack: true, showProfile: false });
+      break;
+
+    case "/posts":
+      renderPage(PostListPage, { showBack: false, showProfile: true });
+      break;
+
+    case "/login":
+    default:
+      renderPage(LoginPage, { showBack: false, showProfile: false });
+      break;
+  }
+}
+
+window.addEventListener("load", handleRouting);
+window.addEventListener("hashchange", handleRouting);
+
+export function navigate(path) {
+  window.location.hash = path;
+}
+
 
 export { renderPage };
