@@ -1,15 +1,18 @@
 {
-  "name": "express_webserver",
+  "name": "community-fe",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Vanilla JS + Express 기반 SPA 프로젝트",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "cors": "^2.8.5"
   },
-  "description": ""
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "license": "ISC"
 }
