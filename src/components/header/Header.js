@@ -19,7 +19,7 @@ export default function Header({
 
   if (showBack) {
     const backButton = new Button({
-      icon: "../.././../public/assets/images/back_button.png",
+      icon: "/assets/images/back_button.png",
       className: "icon",
       ariaLabel: "뒤로가기",
       onClick: () => history.back(),
@@ -38,7 +38,7 @@ export default function Header({
 
   if (showProfile) {
     const profileButton = new Button({
-      icon: "../.././../public/assets/images/default_profile.png",
+      icon: "/assets/images/default_profile.png",
       className: "icon",
       ariaLabel:"프로필",
       onClick: () => console.log("프로필 클릭"),
