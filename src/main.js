@@ -1,7 +1,8 @@
 import Header from "./components/header/Header.js";
 import LoginPage from "./pages/login/LoginPage.js";
-import SignupPage from './pages/signup/SignupPage.js';
-import PostListPage from './pages/post-list/PostListPage.js';
+import SignupPage from "./pages/signup/SignupPage.js";
+import PostListPage from "./pages/post-list/PostListPage.js";
+import EditProfilePage from './pages/edit-profile/EditProfilePage.js';
 
 const root = document.querySelector("#root");
 
@@ -42,6 +43,10 @@ function handleRouting() {
       renderPage(PostListPage, { showBack: false, showProfile: true });
       break;
 
+    case "/edit-profile":
+      renderPage(EditProfilePage, { showBack: true });
+      break;
+
     case "/login":
     default:
       renderPage(LoginPage, { showBack: false, showProfile: false });
@@ -56,6 +61,5 @@ export function navigate(path) {
   console.log(window.location.hash);
   window.location.hash = path;
 }
-
 
 export { renderPage };
