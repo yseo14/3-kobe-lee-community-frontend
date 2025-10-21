@@ -2,7 +2,7 @@ import InputField from "../../components/input-field/InputField.js";
 import ProfileUpload from "../../components/profile-upload/ProfileUpload.js";
 import Button from "../../components/button/Button.js";
 import { navigate } from "../../main.js";
-import { BASE_URL } from "../../config/api.js";
+import { signUp } from "../../api/memberApi.js";
 
 export default function SignupPage() {
   const container = document.createElement("div");
@@ -101,24 +101,22 @@ export default function SignupPage() {
       }
 
       try {
-        const res = await fetch(`${BASE_URL}/member`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            nickname,
-            password,
-            confirmPassword,
-            imageId: null,
-          }),
+        const { ok, data } = await signUp({
+          //  회원가입 API 호출
+          email,
+          nickname,
+          password,
+          confirmPassword,
         });
 
-        const data = await res.json();
+        if (!ok) {
+          message.textContent = data.message || "서버 오류가 발생했습니다.";
+          message.style.color = "red";
+          return;
+        }
 
-        if (!res.ok || !data.success) {
-          message.textContent = `${data.message || "회원가입 실패"}`;
+        if (data.isSuccess === false) {
+          message.textContent = data.message || "회원가입 실패";
           message.style.color = "red";
           return;
         }
@@ -130,7 +128,7 @@ export default function SignupPage() {
         setTimeout(() => navigate("/login"), 1000);
       } catch (err) {
         console.error("회원가입 요청 실패:", err);
-        message.textContent = "서버와 연결할 수 없습니다";
+        message.textContent = err.message || "서버와 연결할 수 없습니다.";
         message.style.color = "red";
       }
     },

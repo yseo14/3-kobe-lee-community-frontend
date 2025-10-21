@@ -53,6 +53,7 @@ window.addEventListener("load", handleRouting);
 window.addEventListener("hashchange", handleRouting);
 
 export function navigate(path) {
+  console.log(window.location.hash);
   window.location.hash = path;
 }
 
