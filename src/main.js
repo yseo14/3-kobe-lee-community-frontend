@@ -1,6 +1,7 @@
 import Header from "./components/header/Header.js";
 import LoginPage from "./pages/login/LoginPage.js";
 import SignupPage from './pages/signup/SignupPage.js';
+import PostListPage from './pages/post-list/PostListPage.js';
 
 const root = document.querySelector("#root");
 
@@ -37,7 +38,7 @@ function handleRouting() {
       renderPage(SignupPage, { showBack: true, showProfile: false });
       break;
 
-    case "/posts":
+    case "/post-list":
       renderPage(PostListPage, { showBack: false, showProfile: true });
       break;
 
