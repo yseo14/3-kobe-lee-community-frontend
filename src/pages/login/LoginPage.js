@@ -55,7 +55,7 @@ export default function LoginPage() {
       emailField.hideHelper();
       passwordField.hideHelper();
 
-      navigate("/posts");
+      navigate("/post-list");
     },
   });
 
