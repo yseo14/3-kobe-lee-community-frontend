@@ -1,4 +1,5 @@
 import Button from "../../components/button/Button.js";
+import { navigate } from "../../main.js";
 
 export default function Header({
   title,
@@ -22,7 +23,7 @@ export default function Header({
       icon: "/assets/images/back_button.png",
       className: "icon",
       ariaLabel: "뒤로가기",
-      onClick: () => history.back(),
+      onClick: () => (onBack ? onBack() : history.back()),
     });
     left.appendChild(backButton.render());
   }
@@ -37,19 +38,60 @@ export default function Header({
   right.className = "header-right";
 
   if (showProfile) {
+    const profileContainer = document.createElement("div");
+    profileContainer.className = "profile-container";
+
     const profileButton = new Button({
       icon: "/assets/images/default_profile.png",
       className: "icon",
-      ariaLabel:"프로필",
-      onClick: () => console.log("프로필 클릭"),
-    })
-    right.appendChild(profileButton.render());
+      ariaLabel: "프로필",
+      onClick: (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle("show");
+      },
+    });
+
+    // ✅ 드롭다운 메뉴 생성
+    const dropdown = document.createElement("div");
+    dropdown.className = "profile-dropdown";
+
+    const editProfile = document.createElement("button");
+    editProfile.textContent = "회원정보 수정";
+    editProfile.onclick = () => {
+      dropdown.classList.remove("show");
+      navigate("/edit-profile");
+    };
+
+    const changePassword = document.createElement("button");
+    changePassword.textContent = "비밀번호 수정";
+    changePassword.onclick = () => {
+      dropdown.classList.remove("show");
+      navigate("/change-password");
+    };
+
+    const logout = document.createElement("button");
+    logout.textContent = "로그아웃";
+    logout.onclick = () => {
+      dropdown.classList.remove("show");
+      sessionStorage.clear();
+      navigate("/login");
+    };
+
+    dropdown.append(editProfile, changePassword, logout);
+
+    // 외부 클릭 시 드롭다운 닫기
+    document.addEventListener("click", (e) => {
+      if (!profileContainer.contains(e.target)) {
+        dropdown.classList.remove("show");
+      }
+    });
+
+    profileContainer.append(profileButton.render(), dropdown);
+    right.appendChild(profileContainer);
   }
 
   // 구조 조립
-  inner.appendChild(left);
-  inner.appendChild(center);
-  inner.appendChild(right);
+  inner.append(left, center, right);
   header.appendChild(inner);
 
   return header;
