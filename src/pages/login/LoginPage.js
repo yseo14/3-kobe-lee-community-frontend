@@ -56,7 +56,7 @@ export default function LoginPage() {
       const password = document.getElementById("password").value.trim();
 
       if (!container.contains(message)) container.appendChild(message);
-      
+
       if (!email) {
         emailField.showHelper("이메일을 입력하세요.");
         passwordField.hideHelper();
@@ -86,8 +86,19 @@ export default function LoginPage() {
           message.style.color = "red";
           return;
         }
+
+        if (!data.result.accessToken) {
+          throw new Error("로그인 응답에 access token이 존재하지 않습니다.");
+        }
+
+        sessionStorage.setItem(
+          "accessToken",
+          data.result.accessToken
+        );
+
         message.textContent = "로그인 성공! 게시글 목록 페이지로 이동합니다.";
         message.style.color = "green";
+
 
         setTimeout(() => navigate("/post-list"), 1000);
       } catch (err) {

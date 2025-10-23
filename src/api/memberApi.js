@@ -1,8 +1,9 @@
-import { apiRequest } from "./index.js";
+import { apiRequest } from "./api.js";
 
 export function signUp(body) {
   return apiRequest("/member", {
     method: "POST",
+    credentials: "omit", //  회원가입은 요청 및 응답에 쿠키 필요 없음. 
     body: JSON.stringify(body),
   });
 }
