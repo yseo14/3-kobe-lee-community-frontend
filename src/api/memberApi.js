@@ -22,3 +22,9 @@ export function deleteMember() {
     method: "DELETE",
   });
 }
+
+export function getMyInfo(){
+  return apiRequest("/member", {
+    method: "GET",
+  });
+}

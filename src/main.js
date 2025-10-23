@@ -4,6 +4,10 @@ import SignupPage from "./pages/signup/SignupPage.js";
 import PostListPage from "./pages/post-list/PostListPage.js";
 import EditProfilePage from './pages/edit-profile/EditProfilePage.js';
 
+export const appState = {
+  pageData: null,
+};
+
 const root = document.querySelector("#root");
 
 const layout = document.createElement("div");
@@ -44,7 +48,7 @@ function handleRouting() {
       break;
 
     case "/edit-profile":
-      renderPage(EditProfilePage, { showBack: true });
+      renderPage(() => EditProfilePage(appState.pageData),  { showBack: true });
       break;
 
     case "/login":
@@ -57,8 +61,9 @@ function handleRouting() {
 window.addEventListener("load", handleRouting);
 window.addEventListener("hashchange", handleRouting);
 
-export function navigate(path) {
+export function navigate(path, data = null) {
   console.log(window.location.hash);
+  appState.pageData = data;
   window.location.hash = path;
 }
 

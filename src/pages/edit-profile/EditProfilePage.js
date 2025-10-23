@@ -79,7 +79,7 @@ export default function EditProfilePage(userData) {
           return;
         }
 
-        showToast("회원정보가 수정되었습니다 🎉");
+        showToast("회원정보가 수정되었습니다");
       } catch (err) {
         message.textContent = err.message || "서버와 연결할 수 없습니다.";
         message.style.color = "red";
