@@ -42,12 +42,12 @@ export default function PostCreatePage() {
   imageLabel.style.marginBottom = "6px";
   imageWrapper.appendChild(imageLabel);
 
-  // ✅ 다중 이미지 업로드 input
+  // 다중 이미지 업로드 input
   const fileInput = document.createElement("input");
   fileInput.type = "file";
   fileInput.id = "images";
   fileInput.accept = "image/*";
-  fileInput.multiple = true; // ✅ 여러 장 업로드 가능
+  fileInput.multiple = true; // 여러 장 업로드 가능
 
   const helperText = document.createElement("p");
   helperText.className = "helper-text";
@@ -56,7 +56,7 @@ export default function PostCreatePage() {
   helperText.style.color = "#666";
   helperText.style.marginTop = "4px";
 
-  // ✅ 선택된 파일 목록 표시
+  // 선택된 파일 목록 표시
   const fileList = document.createElement("ul");
   fileList.className = "file-list";
   fileList.style.listStyle = "disc";
@@ -99,7 +99,7 @@ export default function PostCreatePage() {
       const content = contentField.inputEl?.value.trim() || "";
       const files = fileInput.files;
 
-      // --- 기본 유효성 검증 ---
+      // 입력 필드들 유효성 검증
       if (!title) {
         showToast("제목을 입력해주세요.");
         return;
@@ -113,7 +113,7 @@ export default function PostCreatePage() {
         return;
       }
 
-      // --- 임시 imageIds 생성 (백엔드 구현 전) ---
+      // 임시 imageIds 생성 (백엔드 구현 전) 
       const imageIds = [1,2,3];
       const thumbnailImageId = imageIds.length > 0 ? imageIds[0] : null;
 
