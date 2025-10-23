@@ -1,5 +1,6 @@
 import Button from "../../components/button/Button.js";
 import { navigate } from "../../main.js";
+import { getMyInfo } from "../../api/memberApi.js";
 
 export default function Header({
   title,
@@ -51,13 +52,14 @@ export default function Header({
       },
     });
 
-    // ✅ 드롭다운 메뉴 생성
+    // 드롭다운 메뉴 생성
     const dropdown = document.createElement("div");
     dropdown.className = "profile-dropdown";
 
+    // 회원정보 수정
     const editProfile = document.createElement("button");
     editProfile.textContent = "회원정보 수정";
-    editProfile.onclick = () => {
+    editProfile.onclick = async () => {
       dropdown.classList.remove("show");
       navigate("/edit-profile");
     };

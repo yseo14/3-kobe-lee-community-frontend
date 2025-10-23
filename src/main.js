@@ -2,7 +2,11 @@ import Header from "./components/header/Header.js";
 import LoginPage from "./pages/login/LoginPage.js";
 import SignupPage from "./pages/signup/SignupPage.js";
 import PostListPage from "./pages/post-list/PostListPage.js";
-import EditProfilePage from './pages/edit-profile/EditProfilePage.js';
+import EditProfilePage from "./pages/edit-profile/EditProfilePage.js";
+
+export const appState = {
+  pageData: null,
+};
 
 const root = document.querySelector("#root");
 
@@ -57,8 +61,9 @@ function handleRouting() {
 window.addEventListener("load", handleRouting);
 window.addEventListener("hashchange", handleRouting);
 
-export function navigate(path) {
+export function navigate(path, data = null) {
   console.log(window.location.hash);
+  appState.pageData = data;
   window.location.hash = path;
 }
 
