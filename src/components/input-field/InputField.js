@@ -9,6 +9,8 @@ export default class InputField {
     requiredMessage = "",
     validateFn = null,
     invalidMessage = "",
+    width = "320px",
+    height = null,
   }) {
     this.id = id;
     this.label = label;
@@ -19,6 +21,8 @@ export default class InputField {
     this.requiredMessage = requiredMessage;
     this.validateFn = validateFn;
     this.invalidMessage = invalidMessage;
+    this.width = width;
+    this.height = height;
   }
 
   render() {
@@ -30,11 +34,22 @@ export default class InputField {
     labelEl.setAttribute("for", this.id);
     labelEl.textContent = this.label;
 
-    const inputEl = document.createElement("input");
+    // type이 "textarea"일 경우 textarea 생성
+    const inputEl =
+      this.type === "textarea"
+        ? document.createElement("textarea")
+        : document.createElement("input");
+
     inputEl.className = "input-field";
-    inputEl.type = this.type;
     inputEl.id = this.id;
     inputEl.placeholder = this.placeholder;
+
+    // type이 input일 때만 type 속성 부여
+    if (this.type !== "textarea") inputEl.type = this.type;
+
+    // width / height 반영
+    inputEl.style.width = this.width;
+    if (this.height) inputEl.style.height = this.height;
 
     const helperEl = document.createElement("p");
     helperEl.className = "helper-text";
@@ -44,6 +59,7 @@ export default class InputField {
     wrapper.appendChild(inputEl);
     wrapper.appendChild(helperEl);
 
+    // Helper 표시/숨김 함수
     this.showHelper = (message) => {
       helperEl.textContent = message;
       helperEl.classList.add("show");
@@ -59,7 +75,7 @@ export default class InputField {
 
     // focus/blur 기반 검증 자동 적용
     inputEl.addEventListener("focus", () => {
-      this.hideHelper(); // 포커스 들어오면 기존 메시지 숨기기
+      this.hideHelper();
     });
 
     inputEl.addEventListener("blur", () => {
@@ -79,7 +95,6 @@ export default class InputField {
         return;
       }
 
-      // 통과 시 숨김
       this.hideHelper();
     });
 
