@@ -61,23 +61,7 @@ export default function Header({
     editProfile.textContent = "회원정보 수정";
     editProfile.onclick = async () => {
       dropdown.classList.remove("show");
-      try {
-
-        // 로그인한 사용자 정보 요청
-        const { ok, data } = await getMyInfo();
-        if (!ok || !data.isSuccess) {
-          alert("회원 정보를 불러올 수 없습니다. 다시 로그인해주세요.");
-          sessionStorage.clear();
-          navigate("/login");
-          return;
-        }
-
-        const userData = data.result;
-        navigate("/edit-profile", userData);
-      } catch (err) {
-        console.error("회원정보 조회 실패:", err);
-        alert("서버와 연결할 수 없습니다.");
-      }
+      navigate("/edit-profile");
     };
 
     const changePassword = document.createElement("button");
