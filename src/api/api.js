@@ -27,6 +27,7 @@ export async function apiRequest(endpoint, options = {}) {
       console.warn("Access Token이 만료되었습니다. 재발급 요청을 시도합니다.");
       const refreshed = await tryRefreshToken();
 
+      // access 토큰을 재발급 받았다면
       if (refreshed) {
         // 새 access token으로 다시 요청
         const newAccessToken = sessionStorage.getItem("accessToken");
@@ -55,6 +56,12 @@ export async function apiRequest(endpoint, options = {}) {
   }
 }
 
+
+/**
+ * 토큰 재발급을 시도하는 메서드 
+ * 서버에서 클라이언트의 refresh token을 확인해야하므로 Http Only 쿠키를 동봉한다.
+ * @returns 재발급 성공: true, 실패: false
+ */
 async function tryRefreshToken() {
   try {
     const res = await fetch(`${BASE_URL}/auth/refresh`, {
@@ -75,7 +82,8 @@ async function tryRefreshToken() {
       console.error("Refresh 응답에 accessToken이 없습니다.");
       return false;
     }
-
+    
+    // access toke 재발급 후 세션 스토리지에 저장
     sessionStorage.setItem("accessToken", newAccessToken);
     console.info("Access token successfully refreshed.");
     return true;
