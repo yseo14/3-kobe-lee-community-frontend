@@ -1,4 +1,5 @@
 import Button from "../../components/button/Button.js";
+import { navigate } from '../../main.js';
 
 export default function PostListPage() {
   const container = document.createElement("div");
@@ -25,7 +26,7 @@ export default function PostListPage() {
     className: "primary",
     width: "100px",
     onClick: () => {
-      window.location.hash = "/post/new"; // 예시: 글쓰기 페이지로 이동
+      navigate("/post-create");
     },
   });
 

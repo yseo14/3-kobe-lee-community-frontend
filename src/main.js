@@ -3,6 +3,7 @@ import LoginPage from "./pages/login/LoginPage.js";
 import SignupPage from "./pages/signup/SignupPage.js";
 import PostListPage from "./pages/post-list/PostListPage.js";
 import EditProfilePage from "./pages/edit-profile/EditProfilePage.js";
+import PostCreatePage from './pages/post-create/postCreatePage.js';
 
 export const appState = {
   pageData: null,
@@ -45,6 +46,10 @@ function handleRouting() {
 
     case "/post-list":
       renderPage(PostListPage, { showBack: false, showProfile: true });
+      break;
+
+    case "/post-create":
+      renderPage(PostCreatePage, { showBack: true, showProfile: true });
       break;
 
     case "/edit-profile":
