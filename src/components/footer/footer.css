@@ -1,0 +1,39 @@
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  background-color: #f6f6f8;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.footer-inner {
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  justify-content: center; /* ✅ 가운데 정렬 */
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-link {
+  color: #666;
+  font-size: 13px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-link:hover {
+  color: #333;
+  text-decoration: underline;
+}
+
+.footer-divider {
+  color: #aaa;
+  font-size: 13px;
+}
