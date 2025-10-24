@@ -17,7 +17,7 @@ export default function PostListPage() {
   introSection.appendChild(introText);
   container.appendChild(introSection);
 
-  // 📝 게시글 작성 버튼 (오른쪽 정렬)
+  // 게시글 작성 버튼 (오른쪽 정렬)
   const buttonSection = document.createElement("div");
   buttonSection.className = "post-write-section";
 
@@ -29,10 +29,10 @@ export default function PostListPage() {
       navigate("/post-create");
     },
   });
-
   buttonSection.appendChild(writeButton.render());
   container.appendChild(buttonSection);
 
+  // 게시글 목록 
   const postList = document.createElement("div");
   postList.className = "post-list";
 
