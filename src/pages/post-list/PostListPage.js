@@ -1,5 +1,6 @@
 import Button from "../../components/button/Button.js";
-import { navigate } from '../../main.js';
+import { navigate } from "../../main.js";
+import { fetchPosts } from "../../api/postApi.js";
 
 export default function PostListPage() {
   const container = document.createElement("div");
@@ -32,73 +33,148 @@ export default function PostListPage() {
   buttonSection.appendChild(writeButton.render());
   container.appendChild(buttonSection);
 
-  // 게시글 목록 
+  // 게시글 목록
   const postList = document.createElement("div");
   postList.className = "post-list";
-
-  const dummyPosts = [
-    {
-      id: 1,
-      title: "제목 1",
-      author: "더미 작성자1",
-      likes: 0,
-      comments: 0,
-      views: 0,
-      createdAt: "2021-01-01 00:00:00",
-    },
-    {
-      id: 2,
-      title: "제목 2",
-      author: "더미 작성자2",
-      likes: 10,
-      comments: 2,
-      views: 33,
-      createdAt: "2021-02-01 12:00:00",
-    },
-  ];
-
-  // 카드 생성 함수
-  dummyPosts.forEach((post) => {
-    const card = document.createElement("div");
-    card.className = "post-card";
-
-    const titleRow = document.createElement("div");
-    titleRow.className = "post-title-row";
-
-    const title = document.createElement("h3");
-    title.textContent = post.title;
-
-    const date = document.createElement("span");
-    date.className = "post-date";
-    date.textContent = post.createdAt;
-
-    titleRow.appendChild(title);
-    titleRow.appendChild(date);
-
-    const infoRow = document.createElement("div");
-    infoRow.className = "post-info";
-    infoRow.textContent = `좋아요 ${post.likes}   댓글 ${post.comments}   조회수 ${post.views}`;
-
-    const authorRow = document.createElement("div");
-    authorRow.className = "post-author";
-
-    const profile = document.createElement("div");
-    profile.className = "profile-placeholder";
-
-    const authorName = document.createElement("span");
-    authorName.textContent = post.author;
-
-    authorRow.appendChild(profile);
-    authorRow.appendChild(authorName);
-
-    card.appendChild(titleRow);
-    card.appendChild(infoRow);
-    card.appendChild(authorRow);
-
-    postList.appendChild(card);
-  });
-
   container.appendChild(postList);
+
+  // sentinel: 해당 객체가 화면에 보이면 api를 전송한다.
+  const sentinel = document.createElement("div");
+  sentinel.className = "scroll-sentinel";
+  postList.appendChild(sentinel);
+
+  const PAGE_SIZE = 10;
+  let isLoading = false;
+  let isLastPage = false;
+  let sortType = "createdAt";
+  let cursorId = null;
+  let cursorValue = null;
+
+  // -------------------------------
+  // 게시글 렌더링 함수
+  // -------------------------------
+  const renderPosts = (posts) => {
+    posts.forEach((post) => {
+      const card = document.createElement("div");
+      card.className = "post-card";
+
+      const titleRow = document.createElement("div");
+      titleRow.className = "post-title-row";
+
+      const title = document.createElement("h3");
+      title.textContent = post.title;
+
+      const date = document.createElement("span");
+      date.className = "post-date";
+
+      // 날짜 포맷: 2025-10-24 12:16:00
+      const d = new Date(post.createdAt);
+      const formattedDate = `${d.getFullYear()}-${String(
+        d.getMonth() + 1
+      ).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${String(
+        d.getHours()
+      ).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(
+        d.getSeconds()
+      ).padStart(2, "0")}`;
+
+      date.textContent = formattedDate;
+      titleRow.append(title, date);
+
+      // 좋아요/댓글/조회수 행
+      const infoRow = document.createElement("div");
+      infoRow.className = "post-info";
+      infoRow.textContent = `좋아요 ${post.likeCount}   댓글 ${post.commentCount}   조회수 ${post.viewCount}`;
+
+      // 구분선 추가
+      const divider = document.createElement("hr");
+      divider.className = "post-divider";
+
+      // 작성자
+      const authorRow = document.createElement("div");
+      authorRow.className = "post-author";
+
+      const profile = document.createElement("div");
+      profile.className = "profile-placeholder";
+
+      const authorName = document.createElement("span");
+      authorName.textContent = post.nickname;
+
+      authorRow.append(profile, authorName);
+
+      // 조립
+      card.append(titleRow, infoRow, divider, authorRow);
+      postList.insertBefore(card, sentinel);
+    });
+  };
+
+  // -------------------------------
+  // 게시글 불러오기 (API)
+  // -------------------------------
+  const loadPosts = async () => {
+    if (isLoading || isLastPage) return;
+    isLoading = true;
+
+    try {
+      const { ok, data } = await fetchPosts({
+        sort: sortType,
+        limit: PAGE_SIZE,
+        cursorId,
+        cursorValue,
+      });
+
+      if (!ok || !data.isSuccess) {
+        console.error("게시글 불러오기 실패:", data.message);
+        isLoading = false;
+        return;
+      }
+
+      const posts = data.result.postList || [];
+      if (posts.length === 0) {
+        console.log("더 이상 게시글 없음");
+        isLastPage = true;
+        observer.disconnect();
+        return;
+      }
+
+      renderPosts(posts);
+
+      // 다음 페이지용 커서 갱신
+      cursorId = data.result.nextCursorId;
+      cursorValue = data.result.nextCursorValue;
+
+      console.log(
+        `Loaded ${posts.length} posts, next cursor:`,
+        cursorId,
+        cursorValue
+      );
+    } catch (err) {
+      console.error("서버 통신 에러:", err);
+    } finally {
+      isLoading = false;
+    }
+  };
+
+  // -------------------------------
+  // 무한 스크롤 트리거
+  // -------------------------------
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const target = entries[0];
+      if (target.isIntersecting && !isLoading && !isLastPage) {
+        loadPosts();
+      }
+    },
+    {
+      root: postList, // 내부 스크롤 기준 변경
+      rootMargin: "0px 0px 150px 0px", // 스크롤 하단 여유 공간
+      threshold: 0,
+    }
+  );
+
+  observer.observe(sentinel);
+
+  // 첫 로드
+  loadPosts();
 
   return container;
 }

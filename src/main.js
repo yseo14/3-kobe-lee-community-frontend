@@ -24,7 +24,7 @@ const header = Header({
 layout.appendChild(header);
 
 // content, 페이지가 전환되며 내용이 들어가는 공간
-const content = document.createElement("div");
+const content = document.createElement("main");
 content.id = "content";
 layout.appendChild(content);
 
