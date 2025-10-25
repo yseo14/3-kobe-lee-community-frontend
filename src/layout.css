@@ -1,0 +1,31 @@
+.layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f6f6f8;
+    box-sizing: border-box;
+}
+
+#content {
+    flex: 1;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+
+    padding-top: 60px;
+    padding-bottom: 56px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Pretendard", sans-serif;
+    background-color: #f6f6f8;
+    overflow-x: hidden;
+}
