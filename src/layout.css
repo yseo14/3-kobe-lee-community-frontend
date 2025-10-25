@@ -21,7 +21,7 @@ html, body {
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   padding-top: 60px; /* header 높이 보정 */
   padding-bottom: 56px; /* footer 높이 보정 */
   box-sizing: border-box;
