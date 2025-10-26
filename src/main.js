@@ -4,7 +4,8 @@ import SignupPage from "./pages/signup/SignupPage.js";
 import PostListPage from "./pages/post-list/PostListPage.js";
 import EditProfilePage from "./pages/edit-profile/EditProfilePage.js";
 import PostCreatePage from "./pages/post-create/postCreatePage.js";
-import Footer from './components/footer/Footer.js';
+import Footer from "./components/footer/Footer.js";
+import PostDetailPage from "./pages/post-detail/PostDetailPage.js";
 
 export const appState = {
   pageData: null,
@@ -63,8 +64,12 @@ function handleRouting() {
       renderPage(PostCreatePage, { showBack: true, showProfile: true });
       break;
 
+    case "/post-detail":
+      renderPage(PostDetailPage, { showBack: true, showProfile: true });
+      break;
+    
     case "/edit-profile":
-      renderPage(EditProfilePage, { showBack: true });
+      renderPage(EditProfilePage, { showBack: true, showProfile: true });
       break;
 
     case "/login":
