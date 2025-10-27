@@ -83,9 +83,10 @@ window.addEventListener("load", handleRouting);
 window.addEventListener("hashchange", handleRouting);
 
 export function navigate(path, data = null) {
-  console.log(window.location.hash);
+  console.log("이전 페이지", window.location.hash);
   appState.pageData = data;
   window.location.hash = path;
+  console.log("현재 페이지", path);
 }
 
 export { renderPage };
