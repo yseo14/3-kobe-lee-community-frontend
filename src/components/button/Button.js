@@ -1,9 +1,9 @@
 export default class Button {
   constructor({
-    text = "", // 텍스트 버튼일 때 표시할 문구
-    icon = null, // 이미지 버튼일 때 사용할 아이콘 경로
-    ariaLabel = "", // 접근성용
-    className = "primary", // 스타일 타입 (primary, text, icon 등)
+    text = "",
+    icon = null,
+    ariaLabel = "",
+    className = "primary", // primary, text, icon, secondary-outline
     width = "auto",
     height = "auto",
     onClick = () => {},
@@ -40,7 +40,6 @@ export default class Button {
     }
 
     button.addEventListener("click", (e) => this.onClick(e));
-
     return button;
   }
 }
