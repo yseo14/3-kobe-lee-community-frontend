@@ -224,25 +224,36 @@
 
 .comment-top {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
 }
 
-.comment-top .profile-placeholder {
+.comment-top-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.comment-top-left .profile-placeholder {
     width: 28px;
     height: 28px;
+    background-color: #ddd;
+    border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .comment-author {
-    font-weight: 600;
+    font-weight: 700;
     color: #333;
-    margin-right: 10px;
+    font-size: 14px;
 }
 
 .comment-date {
     font-size: 13px;
     color: #777;
+    margin-left: 4px;
 }
+
 
 .comment-content {
     font-size: 14px;
