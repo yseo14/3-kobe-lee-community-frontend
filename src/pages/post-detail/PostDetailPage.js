@@ -197,7 +197,7 @@ export default function PostDetailPage() {
         limit: PAGE_SIZE,
         cursorId,
         cursorCreatedAt,
-      });
+      });s
 
       if (!ok || !data.isSuccess) {
         console.error("댓글 목록 불러오기 실패:", data?.message);
@@ -206,14 +206,15 @@ export default function PostDetailPage() {
       }
 
       const comments = data.result.commentList || [];
+
+      renderComments(comments);
+
       if (comments.length === 0) {
-        console.log("더 이상 댓글 없음");
+        console.log("댓글이 없습니다. 입력창만 표시됩니다.");
         isLastPage = true;
         observer.disconnect();
         return;
       }
-
-      renderComments(comments);
 
       cursorId = data.result.nextCursorId;
       cursorCreatedAt = data.result.nextCursorCreatedAt;
