@@ -49,9 +49,12 @@ function renderPage(pageComponent, headerOptions = {}) {
 
 // 페이지 전환을 위한 라우팅 함수
 function handleRouting() {
-  const path = window.location.hash.replace("#", "");
+  // 예: "#/post-detail/17"
+  const hash = window.location.hash.replace("#", "");
+  const [route, id] = hash.split("/").filter(Boolean); // ['post-detail', '17']
 
-  switch (path) {
+  // 라우트에 따라 페이지 전환
+  switch (`/${route || ""}`) {
     case "/signup":
       renderPage(SignupPage, { showBack: true, showProfile: false });
       break;
@@ -64,13 +67,19 @@ function handleRouting() {
       renderPage(PostCreatePage, { showBack: true, showProfile: true });
       break;
 
-    case "/post-detail":
-      const postId = appState.pageData?.postId;
+    case "/post-detail": {
+      // postId는 URL(#/post-detail/17) 또는 appState에서 가져옴
+      const postId = id || appState.pageData?.postId;
+      if (!postId) {
+        content.innerHTML = `<p>잘못된 접근입니다.</p>`;
+        return;
+      }
       renderPage(() => PostDetailPage(postId), {
         showBack: true,
         showProfile: true,
       });
       break;
+    }
 
     case "/edit-profile":
       renderPage(EditProfilePage, { showBack: true, showProfile: true });
@@ -83,17 +92,23 @@ function handleRouting() {
   }
 }
 
+export function navigate(path, params = {}) {
+  const currentHash = window.location.hash;
+  console.log("이전 페이지:", currentHash);
+
+  // postId가 있으면 URL에 포함 (#/post-detail/17)
+  if (params.postId) {
+    window.location.hash = `${path.replace(/\/$/, "")}/${params.postId}`;
+  } else {
+    window.location.hash = path;
+  }
+
+  console.log("현재 페이지:", window.location.hash);
+}
+
 //  초기 렌더링 시, 즉 최초 한번 실행
 window.addEventListener("load", handleRouting);
-
 //  이후 url의 해시(# 뒷부분)이 바뀔 때마다 실행
 window.addEventListener("hashchange", handleRouting);
-
-export function navigate(path, data = null) {
-  console.log("이전 페이지", window.location.hash);
-  appState.pageData = data;
-  window.location.hash = path;
-  console.log("현재 페이지", path);
-}
 
 export { renderPage };

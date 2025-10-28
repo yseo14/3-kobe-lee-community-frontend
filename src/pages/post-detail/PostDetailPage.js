@@ -1,11 +1,18 @@
 import Button from "../../components/button/Button.js";
-import { appState } from "../../main.js";
 import { fetchPostDetail } from "../../api/postApi.js";
 import { fetchComments } from "../../api/commentApi.js";
 
-export default function PostDetailPage() {
+export default function PostDetailPage(postIdFromRoute) {
   const container = document.createElement("div");
   container.className = "post-detail-container";
+
+  // postId를 URL에서 직접 가져온다
+  const postId = postIdFromRoute || window.location.hash.split("/").pop(); // 예: #/post-detail/17 → 17
+
+  if (!postId || isNaN(postId)) {
+    container.innerHTML = `<p>잘못된 접근입니다.</p>`;
+    return container;
+  }
 
   // 날짜 포맷 함수
   const formatDate = (isoString) => {
@@ -19,7 +26,7 @@ export default function PostDetailPage() {
     )}:${String(d.getMinutes()).padStart(2, "0")}`;
   };
 
-  // 기본 구조
+  // 전체 기본 구조
   const mainSection = document.createElement("div");
   mainSection.className = "post-main-section";
 
@@ -39,6 +46,7 @@ export default function PostDetailPage() {
     title.className = "post-title";
     title.textContent = post.title;
 
+    // 작성자 정보
     const authorRow = document.createElement("div");
     authorRow.className = "post-author-row";
 
@@ -58,6 +66,7 @@ export default function PostDetailPage() {
 
     authorLeft.append(profile, authorName, date);
 
+    // 수정 / 삭제 버튼
     const actions = document.createElement("div");
     actions.className = "post-action-group";
 
@@ -65,7 +74,7 @@ export default function PostDetailPage() {
       const editBtn = new Button({
         text: "수정",
         className: "secondary-outline",
-        onClick: () => console.log("게시글 수정 클릭"),
+        onClick: () => console.log("게시글 수정 클릭", post.postId),
         width: "60px",
         height: "32px",
       }).render();
@@ -76,7 +85,7 @@ export default function PostDetailPage() {
       const deleteBtn = new Button({
         text: "삭제",
         className: "secondary-outline",
-        onClick: () => console.log("게시글 삭제 클릭"),
+        onClick: () => console.log("게시글 삭제 클릭", post.postId),
         width: "60px",
         height: "32px",
       }).render();
@@ -110,10 +119,10 @@ export default function PostDetailPage() {
   };
 
   // 댓글 렌더링
-  const renderComments = (comments) => {
+  const renderComments = (comments = []) => {
     commentSection.innerHTML = "";
 
-    // 댓글 입력창
+    // 항상 댓글 입력창은 표시
     const commentInputBox = document.createElement("div");
     commentInputBox.className = "comment-input-box";
 
@@ -124,77 +133,73 @@ export default function PostDetailPage() {
     submitBtn.textContent = "댓글 등록";
     commentInputBox.append(textarea, submitBtn);
 
-    // 댓글 목록
     const commentList = document.createElement("div");
     commentList.className = "comment-list";
 
-    comments.forEach((c) => {
-      const item = document.createElement("div");
-      item.className = "comment-item";
+    if (comments.length > 0) {
+      comments.forEach((c) => {
+        const item = document.createElement("div");
+        item.className = "comment-item";
 
-      const top = document.createElement("div");
-      top.className = "comment-top";
+        const top = document.createElement("div");
+        top.className = "comment-top";
 
-      const topLeft = document.createElement("div");
-      topLeft.className = "comment-top-left";
+        const topLeft = document.createElement("div");
+        topLeft.className = "comment-top-left";
 
-      const profile = document.createElement("div");
-      profile.className = "profile-placeholder";
+        const profile = document.createElement("div");
+        profile.className = "profile-placeholder";
 
-      const name = document.createElement("span");
-      name.className = "comment-author";
-      name.textContent = c.nickname;
+        const name = document.createElement("span");
+        name.className = "comment-author";
+        name.textContent = c.nickname;
 
-      const date = document.createElement("span");
-      date.className = "comment-date";
-      date.textContent = formatDate(c.createdAt);
+        const date = document.createElement("span");
+        date.className = "comment-date";
+        date.textContent = formatDate(c.createdAt);
 
-      topLeft.append(profile, name, date);
+        topLeft.append(profile, name, date);
 
-      const actions = document.createElement("div");
-      actions.className = "comment-actions";
+        // 수정/삭제 버튼
+        const actions = document.createElement("div");
+        actions.className = "comment-actions";
 
-      if (c.viewerCanEdit) {
-        const editBtn = new Button({
-          text: "수정",
-          className: "secondary-outline",
-          onClick: () => console.log("댓글 수정 클릭", c.commentId),
-          width: "60px",
-          height: "28px",
-        }).render();
-        actions.appendChild(editBtn);
-      }
-      if (c.viewerCanDelete) {
-        const deleteBtn = new Button({
-          text: "삭제",
-          className: "secondary-outline",
-          onClick: () => console.log("댓글 삭제 클릭", c.commentId),
-          width: "60px",
-          height: "28px",
-        }).render();
-        actions.appendChild(deleteBtn);
-      }
+        if (c.viewerCanEdit) {
+          const editBtn = new Button({
+            text: "수정",
+            className: "secondary-outline",
+            onClick: () => console.log("댓글 수정 클릭", c.commentId),
+            width: "60px",
+            height: "28px",
+          }).render();
+          actions.appendChild(editBtn);
+        }
+        if (c.viewerCanDelete) {
+          const deleteBtn = new Button({
+            text: "삭제",
+            className: "secondary-outline",
+            onClick: () => console.log("댓글 삭제 클릭", c.commentId),
+            width: "60px",
+            height: "28px",
+          }).render();
+          actions.appendChild(deleteBtn);
+        }
 
-      top.append(topLeft, actions);
+        top.append(topLeft, actions);
 
-      const content = document.createElement("p");
-      content.className = "comment-content";
-      content.textContent = c.content;
+        const content = document.createElement("p");
+        content.className = "comment-content";
+        content.textContent = c.content;
 
-      item.append(top, content);
-      commentList.appendChild(item);
-    });
+        item.append(top, content);
+        commentList.appendChild(item);
+      });
+    }
 
     commentSection.append(commentInputBox, commentList);
   };
 
   // 게시글 상세 조회
-  const postId = appState.pageData?.postId;
-  if (!postId) {
-    container.innerHTML = `<p>잘못된 접근입니다.</p>`;
-    return container;
-  }
-
   (async () => {
     try {
       const { ok, data } = await fetchPostDetail(postId);
@@ -236,7 +241,6 @@ export default function PostDetailPage() {
       }
 
       const comments = data.result.commentList || [];
-
       renderComments(comments);
 
       if (comments.length === 0) {
@@ -255,6 +259,7 @@ export default function PostDetailPage() {
     }
   };
 
+  // 스크롤 감시자
   const observer = new IntersectionObserver(
     (entries) => {
       const target = entries[0];
@@ -262,11 +267,7 @@ export default function PostDetailPage() {
         loadComments();
       }
     },
-    {
-      root: container,
-      rootMargin: "0px 0px 150px 0px",
-      threshold: 0,
-    }
+    { root: container, rootMargin: "0px 0px 150px 0px", threshold: 0 }
   );
 
   observer.observe(sentinel);
