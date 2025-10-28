@@ -7,7 +7,7 @@ export default function PostDetailPage() {
   const container = document.createElement("div");
   container.className = "post-detail-container";
 
-  // 날짜 포맷 유틸 함수
+  // 날짜 포맷 함수
   const formatDate = (isoString) => {
     const d = new Date(isoString);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
@@ -62,14 +62,24 @@ export default function PostDetailPage() {
     actions.className = "post-action-group";
 
     if (post.viewerCanEdit) {
-      const editBtn = document.createElement("button");
-      editBtn.textContent = "수정";
+      const editBtn = new Button({
+        text: "수정",
+        className: "secondary-outline",
+        onClick: () => console.log("게시글 수정 클릭"),
+        width: "60px",
+        height: "32px",
+      }).render();
       actions.appendChild(editBtn);
     }
 
     if (post.viewerCanDelete) {
-      const deleteBtn = document.createElement("button");
-      deleteBtn.textContent = "삭제";
+      const deleteBtn = new Button({
+        text: "삭제",
+        className: "secondary-outline",
+        onClick: () => console.log("게시글 삭제 클릭"),
+        width: "60px",
+        height: "32px",
+      }).render();
       actions.appendChild(deleteBtn);
     }
 
@@ -99,7 +109,7 @@ export default function PostDetailPage() {
     mainSection.append(title, authorRow, imageWrapper, content, stats);
   };
 
-  // 댓글 렌더링 함수
+  // 댓글 렌더링
   const renderComments = (comments) => {
     commentSection.innerHTML = "";
 
@@ -143,7 +153,27 @@ export default function PostDetailPage() {
 
       const actions = document.createElement("div");
       actions.className = "comment-actions";
-      actions.innerHTML = `<button>수정</button><button>삭제</button>`;
+
+      if (c.viewerCanEdit) {
+        const editBtn = new Button({
+          text: "수정",
+          className: "secondary-outline",
+          onClick: () => console.log("댓글 수정 클릭", c.commentId),
+          width: "60px",
+          height: "28px",
+        }).render();
+        actions.appendChild(editBtn);
+      }
+      if (c.viewerCanDelete) {
+        const deleteBtn = new Button({
+          text: "삭제",
+          className: "secondary-outline",
+          onClick: () => console.log("댓글 삭제 클릭", c.commentId),
+          width: "60px",
+          height: "28px",
+        }).render();
+        actions.appendChild(deleteBtn);
+      }
 
       top.append(topLeft, actions);
 
@@ -179,7 +209,7 @@ export default function PostDetailPage() {
     }
   })();
 
-  // 댓글 무한 스크롤을 위한 데이터
+  // 댓글 무한 스크롤
   const PAGE_SIZE = 10;
   let isLoading = false;
   let isLastPage = false;
@@ -197,7 +227,7 @@ export default function PostDetailPage() {
         limit: PAGE_SIZE,
         cursorId,
         cursorCreatedAt,
-      });s
+      });
 
       if (!ok || !data.isSuccess) {
         console.error("댓글 목록 불러오기 실패:", data?.message);
@@ -218,12 +248,6 @@ export default function PostDetailPage() {
 
       cursorId = data.result.nextCursorId;
       cursorCreatedAt = data.result.nextCursorCreatedAt;
-
-      console.log(
-        `Loaded ${comments.length} comments, next cursor:`,
-        cursorId,
-        cursorCreatedAt
-      );
     } catch (err) {
       console.error("서버 통신 에러:", err);
     } finally {
@@ -231,7 +255,6 @@ export default function PostDetailPage() {
     }
   };
 
-  // 무한 스크롤 감시 객체 생성
   const observer = new IntersectionObserver(
     (entries) => {
       const target = entries[0];
@@ -247,8 +270,6 @@ export default function PostDetailPage() {
   );
 
   observer.observe(sentinel);
-
-  // 첫 댓글 로드
   loadComments();
 
   return container;
