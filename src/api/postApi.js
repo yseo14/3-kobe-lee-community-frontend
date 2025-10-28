@@ -7,6 +7,10 @@ export function createPost(body) {
   });
 }
 
+/**
+ * 게시글 목록 조회 API
+ * 기본적으로 생성일자 기준 최신순으로 조회
+ */
 export function fetchPosts({
   sort = "latest",
   limit = 10,
@@ -24,4 +28,19 @@ export function fetchPosts({
   return apiRequest(`/post?${params.toString()}`, {
     method: "GET",
   });
+}
+
+/**
+ * 게시글 상세 조회 API
+ * GET /post/{postId}
+ */
+export function fetchPostDetail(postId) {
+  if (!postId) {
+    console.error("postId가 없습니다.");
+    return { ok: false, data: null };
+  }
+
+  return apiRequest(`/post/${postId}`,{
+    method: "GET",
+  })
 }

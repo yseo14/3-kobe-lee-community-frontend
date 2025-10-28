@@ -1,7 +1,6 @@
 import Button from "../../components/button/Button.js";
 import { navigate } from "../../main.js";
 import { fetchPosts } from "../../api/postApi.js";
-import PostDetailPage from '../post-detail/PostDetailPage.js';
 
 export default function PostListPage() {
   const container = document.createElement("div");

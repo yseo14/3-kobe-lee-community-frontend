@@ -65,9 +65,13 @@ function handleRouting() {
       break;
 
     case "/post-detail":
-      renderPage(PostDetailPage, { showBack: true, showProfile: true });
+      const postId = appState.pageData?.postId;
+      renderPage(() => PostDetailPage(postId), {
+        showBack: true,
+        showProfile: true,
+      });
       break;
-    
+
     case "/edit-profile":
       renderPage(EditProfilePage, { showBack: true, showProfile: true });
       break;
@@ -79,7 +83,10 @@ function handleRouting() {
   }
 }
 
+//  초기 렌더링 시, 즉 최초 한번 실행
 window.addEventListener("load", handleRouting);
+
+//  이후 url의 해시(# 뒷부분)이 바뀔 때마다 실행
 window.addEventListener("hashchange", handleRouting);
 
 export function navigate(path, data = null) {
