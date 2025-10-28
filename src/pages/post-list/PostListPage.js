@@ -58,6 +58,12 @@ export default function PostListPage() {
       const card = document.createElement("div");
       card.className = "post-card";
 
+      // 게시글 미리보기 카드를 누르면 상세조회 페이지로 전환
+      card.addEventListener("click", () => {
+        console.log("게시글 상세조회", post.postId);
+        navigate("/post-detail", {postId : post.postId})
+      });
+
       const titleRow = document.createElement("div");
       titleRow.className = "post-title-row";
 
