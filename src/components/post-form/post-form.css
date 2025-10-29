@@ -1,0 +1,26 @@
+.image-upload-wrapper {
+    margin-top: 20px;
+    margin-bottom: 16px;
+}
+
+.image-upload-wrapper input[type="file"] {
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* PostForm */
+.post-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 600px;
+    margin: 80px auto 100px;
+    font-family: "Pretendard", sans-serif;
+}
+
+.post-form-title {
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+}

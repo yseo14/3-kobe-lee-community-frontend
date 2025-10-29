@@ -1,6 +1,7 @@
 import Button from "../../components/button/Button.js";
 import { fetchPostDetail } from "../../api/postApi.js";
 import { fetchComments } from "../../api/commentApi.js";
+import { navigate } from "../../main.js";
 
 export default function PostDetailPage(postIdFromRoute) {
   const container = document.createElement("div");
@@ -74,7 +75,7 @@ export default function PostDetailPage(postIdFromRoute) {
       const editBtn = new Button({
         text: "수정",
         className: "secondary-outline",
-        onClick: () => console.log("게시글 수정 클릭", post.postId),
+        onClick: () => navigate(`/post-detail/${postId}/post-edit`),
         width: "60px",
         height: "32px",
       }).render();

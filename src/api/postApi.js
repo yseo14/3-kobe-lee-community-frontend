@@ -40,7 +40,19 @@ export function fetchPostDetail(postId) {
     return { ok: false, data: null };
   }
 
-  return apiRequest(`/post/${postId}`,{
+  return apiRequest(`/post/${postId}`, {
     method: "GET",
-  })
+  });
+}
+
+/**
+ * 게시글 수정 API
+ * PATCH /post/{postId}
+ */
+updatePost;
+export function updatePost(postId, body) {
+  return apiRequest(`/post/${postId}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
 }
