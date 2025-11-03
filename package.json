@@ -1,0 +1,18 @@
+{
+  "name": "community-fe",
+  "version": "1.0.0",
+  "description": "Vanilla JS + Express 기반 SPA 프로젝트",
+  "type": "module",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "license": "ISC"
+}

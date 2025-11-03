@@ -1,0 +1,29 @@
+/* ===== body 전체 스크롤 차단 ===== */
+html, body {
+  height: 100%;
+  overflow: hidden; /* ✅ 전역 스크롤 제거 */
+  margin: 0;
+  padding: 0;
+  background-color: #f6f6f8;
+  font-family: "Pretendard", sans-serif;
+}
+
+/* ===== 전체 레이아웃 ===== */
+.layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden; /* ✅ layout 자체 스크롤 방지 */
+}
+
+/* ===== main(content) 영역 ===== */
+#content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 60px; /* header 높이 보정 */
+  padding-bottom: 56px; /* footer 높이 보정 */
+  box-sizing: border-box;
+  overflow: hidden; /* ✅ content 자체도 스크롤 불가 */
+}
