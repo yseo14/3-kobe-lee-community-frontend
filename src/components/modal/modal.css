@@ -1,0 +1,69 @@
+/* 오버레이 */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    animation: fadeIn 0.2s ease;
+}
+
+/* 모달 박스 */
+.custom-modal {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 32px 24px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    font-family: "Pretendard", sans-serif;
+    max-width: 90%;
+    animation: slideUp 0.25s ease;
+}
+
+/* 제목 */
+.modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 10px;
+}
+
+/* 내용 */
+.modal-message {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 28px;
+    line-height: 1.5;
+}
+
+/* 버튼 박스 */
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+    from {
+        background-color: rgba(0, 0, 0, 0);
+    }
+
+    to {
+        background-color: rgba(0, 0, 0, 0.45);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

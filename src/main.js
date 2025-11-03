@@ -3,9 +3,10 @@ import LoginPage from "./pages/login/LoginPage.js";
 import SignupPage from "./pages/signup/SignupPage.js";
 import PostListPage from "./pages/post-list/PostListPage.js";
 import EditProfilePage from "./pages/edit-profile/EditProfilePage.js";
-import PostCreatePage from "./pages/post-create/postCreatePage.js";
+import PostCreatePage from "./pages/post/PostCreatePage.js";
 import Footer from "./components/footer/Footer.js";
 import PostDetailPage from "./pages/post-detail/PostDetailPage.js";
+import PostEditPage from "./pages/post/PostEditPage.js";
 
 export const appState = {
   pageData: null,
@@ -49,37 +50,44 @@ function renderPage(pageComponent, headerOptions = {}) {
 
 // 페이지 전환을 위한 라우팅 함수
 function handleRouting() {
-  // 예: "#/post-detail/17"
   const hash = window.location.hash.replace("#", "");
-  const [route, id] = hash.split("/").filter(Boolean); // ['post-detail', '17']
+  const segments = hash.split("/").filter(Boolean);
+  // #/post-list                  → ["post-list"]
+  // #/post-detail/22             → ["post-detail", "22"]
+  // #/post-detail/22/post-edit   → ["post-detail", "22", "post-edit"]
 
-  // 라우트에 따라 페이지 전환
+  const route = segments[0];
+  const id = segments[1];
+  const subRoute = segments[2];
+
   switch (`/${route || ""}`) {
     case "/signup":
-      renderPage(SignupPage, { showBack: true, showProfile: false });
+      renderPage(SignupPage, { showBack: true });
       break;
 
     case "/post-list":
-      renderPage(PostListPage, { showBack: false, showProfile: true });
+      renderPage(PostListPage, { showProfile: true });
       break;
 
     case "/post-create":
       renderPage(PostCreatePage, { showBack: true, showProfile: true });
       break;
 
-    case "/post-detail": {
-      // postId는 URL(#/post-detail/17) 또는 appState에서 가져옴
-      const postId = id || appState.pageData?.postId;
-      if (!postId) {
-        content.innerHTML = `<p>잘못된 접근입니다.</p>`;
-        return;
+    case "/post-detail":
+      if (subRoute === "post-edit") {
+        // 게시글 수정 페이지
+        renderPage(() => PostEditPage(id), {
+          showBack: true,
+          showProfile: true,
+        });
+      } else {
+        // 게시글 상세 페이지
+        renderPage(() => PostDetailPage(id), {
+          showBack: true,
+          showProfile: true,
+        });
       }
-      renderPage(() => PostDetailPage(postId), {
-        showBack: true,
-        showProfile: true,
-      });
       break;
-    }
 
     case "/edit-profile":
       renderPage(EditProfilePage, { showBack: true, showProfile: true });
@@ -87,7 +95,7 @@ function handleRouting() {
 
     case "/login":
     default:
-      renderPage(LoginPage, { showBack: false, showProfile: false });
+      renderPage(LoginPage);
       break;
   }
 }

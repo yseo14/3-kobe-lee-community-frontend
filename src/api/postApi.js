@@ -40,7 +40,28 @@ export function fetchPostDetail(postId) {
     return { ok: false, data: null };
   }
 
-  return apiRequest(`/post/${postId}`,{
+  return apiRequest(`/post/${postId}`, {
     method: "GET",
-  })
+  });
+}
+
+/**
+ * 게시글 수정 API
+ * PATCH /post/{postId}
+ */
+export function updatePost(postId, body) {
+  return apiRequest(`/post/${postId}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+/**
+ * 게시글 삭제 API
+ * DELETE /post/{postId}
+ */
+export function deletePost(postId) {
+  return apiRequest(`/post/${postId}`, {
+    method: "DELETE"
+  });
 }
