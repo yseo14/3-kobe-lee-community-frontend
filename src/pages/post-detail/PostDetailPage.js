@@ -6,6 +6,8 @@ import { deletePost } from "../../api/postApi.js";
 import { showToast } from "../../utils/showToast.js";
 import Modal from "../../components/modal/modal.js";
 import { createComment } from "../../api/commentApi.js";
+import { deleteComment } from '../../api/commentApi.js';
+
 
 export default function PostDetailPage(postIdFromRoute) {
   const container = document.createElement("div");
@@ -248,9 +250,42 @@ export default function PostDetailPage(postIdFromRoute) {
           const deleteBtn = new Button({
             text: "삭제",
             className: "secondary-outline",
-            onClick: () => console.log("댓글 삭제 클릭", c.commentId),
-            width: "60px",
-            height: "28px",
+            onClick: () => {
+              const modal = new Modal({
+                title: "댓글을 삭제하시겠습니까?",
+                message: "삭제한 내용은 복구할 수 없습니다.",
+                cancelText: "취소",
+                confirmText: "확인",
+                onConfirm: async () => {
+                  try {
+                    const { ok, data } = await deleteComment(
+                      postId,
+                      c.commentId
+                    );
+                    if (ok && data.isSuccess) {
+                      showToast("댓글이 삭제되었습니다.");
+
+                      // 목록 다시 불러오기
+                      const { ok: commentOk, data: commentData } =
+                        await fetchComments(postId, {
+                          sort: "createdAt",
+                          limit: 10,
+                        });
+
+                      if (commentOk && commentData.isSuccess) {
+                        renderComments(commentData.result.commentList);
+                      }
+                    } else {
+                      showToast(data?.message || "댓글 삭제에 실패했습니다.");
+                    }
+                  } catch (err) {
+                    console.error("댓글 삭제 실패:", err);
+                    showToast("서버 오류로 댓글 삭제에 실패했습니다.");
+                  }
+                },
+              });
+              modal.open();
+            },
           }).render();
           actions.appendChild(deleteBtn);
         }

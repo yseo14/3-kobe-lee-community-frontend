@@ -25,3 +25,9 @@ export function createComment(postId, content) {
     headers: { "Content-Type": "application/json" },
   });
 }
+
+export function deleteComment(postId, commentId) {
+  return apiRequest(`/post/${postId}/comment/${commentId}`, {
+    method: "DELETE",
+  });
+}
