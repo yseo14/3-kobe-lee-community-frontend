@@ -2,6 +2,9 @@ import Button from "../../components/button/Button.js";
 import { fetchPostDetail } from "../../api/postApi.js";
 import { fetchComments } from "../../api/commentApi.js";
 import { navigate } from "../../main.js";
+import { deletePost } from "../../api/postApi.js";
+import { showToast } from "../../utils/showToast.js";
+import Modal from "../../components/modal/modal.js";
 
 export default function PostDetailPage(postIdFromRoute) {
   const container = document.createElement("div");
@@ -82,11 +85,38 @@ export default function PostDetailPage(postIdFromRoute) {
       actions.appendChild(editBtn);
     }
 
+    // 삭제 버튼 클릭
     if (post.viewerCanDelete) {
       const deleteBtn = new Button({
         text: "삭제",
         className: "secondary-outline",
-        onClick: () => console.log("게시글 삭제 클릭", post.postId),
+        onClick: () => {
+          const modal = new Modal({
+            title: "게시글을 삭제하시겠습니까?",
+            message: "삭제한 내용은 복구할 수 없습니다.",
+            cancelText: "취소",
+            confirmText: "확인",
+            onConfirm: async () => {
+              try {
+                const { ok, data } = await deletePost(post.postId);
+                if (ok && data.isSuccess) {
+                  showToast("게시글이 성공적으로 삭제되었습니다.");
+                  navigate("/post-list");
+                } else {
+                  showToast(data?.message || "게시글 삭제에 실패했습니다.");
+                }
+              } catch (err) {
+                console.error("게시글 삭제 실패:", err);
+                showToast("서버 오류로 삭제에 실패했습니다.");
+              }
+            },
+            onCancel: () => {
+              console.log("삭제 취소");
+            },
+          });
+
+          modal.open();
+        },
         width: "60px",
         height: "32px",
       }).render();
