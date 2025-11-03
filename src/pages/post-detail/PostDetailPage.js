@@ -5,6 +5,7 @@ import { navigate } from "../../main.js";
 import { deletePost } from "../../api/postApi.js";
 import { showToast } from "../../utils/showToast.js";
 import Modal from "../../components/modal/modal.js";
+import { createComment } from "../../api/commentApi.js";
 
 export default function PostDetailPage(postIdFromRoute) {
   const container = document.createElement("div");
@@ -159,9 +160,47 @@ export default function PostDetailPage(postIdFromRoute) {
 
     const textarea = document.createElement("textarea");
     textarea.placeholder = "댓글을 남겨주세요!";
-    const submitBtn = document.createElement("button");
-    submitBtn.className = "btn-comment";
-    submitBtn.textContent = "댓글 등록";
+
+    // 댓글 등록 버튼
+    const submitBtn = new Button({
+      text: "댓글 등록",
+      className: "primary",
+      width: "120px",
+      height: "44px",
+      onClick: async () => {
+        const content = textarea.value.trim();
+        if (!content) {
+          showToast("댓글 내용을 입력해주세요.");
+          return;
+        }
+
+        try {
+          const { ok, data } = await createComment(postId, content);
+          if (ok && data.isSuccess) {
+            showToast("댓글이 등록되었습니다!");
+            textarea.value = "";
+
+            // 작성 후 댓글 목록을 새로 불러옴
+            const { ok: commentOk, data: commentData } = await fetchComments(
+              postId,
+              {
+                sort: "createdAt",
+                limit: 10,
+              }
+            );
+
+            if (commentOk && commentData.isSuccess) {
+              renderComments(commentData.result.commentList);
+            }
+          } else {
+            showToast(data?.message || "댓글 등록에 실패했습니다.");
+          }
+        } catch (err) {
+          console.error("댓글 등록 실패:", err);
+          showToast("서버 오류로 댓글 등록에 실패했습니다.");
+        }
+      },
+    }).render();
     commentInputBox.append(textarea, submitBtn);
 
     const commentList = document.createElement("div");

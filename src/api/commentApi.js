@@ -17,3 +17,11 @@ export function fetchComments(
     method: "GET",
   });
 }
+
+export function createComment(postId, content) {
+  return apiRequest(`/post/${postId}/comment`, {
+    method: "POST",
+    body: JSON.stringify({ content }),
+    headers: { "Content-Type": "application/json" },
+  });
+}
