@@ -1,8 +1,8 @@
 import InputField from "../../components/input-field/InputField.js";
 import Button from "../../components/button/Button.js";
-
 import { navigate } from "../../main.js";
 import { login } from "../../api/authApi.js";
+import { showToast } from "../../utils/showToast.js";
 
 export default function LoginPage() {
   const container = document.createElement("div");
@@ -41,11 +41,7 @@ export default function LoginPage() {
   });
   container.appendChild(passwordField.render());
 
-  const message =
-    document.querySelector(".message") || document.createElement("p");
-  message.className = "message";
-  message.style.marginTop = "12px";
-
+  // 로그인 버튼
   const loginButton = new Button({
     text: "로그인",
     className: "primary",
@@ -55,35 +51,30 @@ export default function LoginPage() {
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
 
-      if (!container.contains(message)) container.appendChild(message);
-
       if (!email) {
         emailField.showHelper("이메일을 입력하세요.");
         passwordField.hideHelper();
+        showToast("이메일을 입력하세요.");
         return;
       }
 
       if (!password) {
         passwordField.showHelper("비밀번호를 입력하세요.");
         emailField.hideHelper();
+        showToast("비밀번호를 입력하세요.");
         return;
       }
 
       try {
-        const { ok, data } = await login({
-          email,
-          password,
-        });
+        const { ok, data } = await login({ email, password });
 
         if (!ok) {
-          message.textContent = data.message || "서버 오류가 발생했습니다.";
-          message.style.color = "red";
+          showToast(data.message || "서버 오류가 발생했습니다.");
           return;
         }
 
         if (data.isSuccess === false) {
-          message.textContent = data.message || "로그인 실패";
-          message.style.color = "red";
+          showToast(data.message || "로그인 실패");
           return;
         }
 
@@ -91,26 +82,19 @@ export default function LoginPage() {
           throw new Error("로그인 응답에 access token이 존재하지 않습니다.");
         }
 
-        sessionStorage.setItem(
-          "accessToken",
-          data.result.accessToken
-        );
+        sessionStorage.setItem("accessToken", data.result.accessToken);
 
-        message.textContent = "로그인 성공! 게시글 목록 페이지로 이동합니다.";
-        message.style.color = "green";
-
-
+        showToast("로그인 성공!");
         setTimeout(() => navigate("/post-list"), 1000);
       } catch (err) {
         console.error("로그인 요청 실패:", err);
-        message.textContent = err.message || "서버와 연결할 수 없습니다.";
-        message.style.color = "red";
+        showToast(err.message || "서버와 연결할 수 없습니다.");
       }
     },
   });
-
   container.appendChild(loginButton.render());
 
+  // 회원가입 버튼
   const signupButton = new Button({
     text: "회원가입",
     className: "text",

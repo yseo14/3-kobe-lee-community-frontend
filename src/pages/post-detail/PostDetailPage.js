@@ -240,7 +240,7 @@ export default function PostDetailPage(postIdFromRoute) {
         content.className = "comment-content";
         content.textContent = c.content;
 
-        let isEditing = false; // ✅ 수정 모드 상태 관리
+        let isEditing = false; // 수정 모드 상태 관리
         let inputEl; // 수정 input 참조용
 
         // 수정 클릭

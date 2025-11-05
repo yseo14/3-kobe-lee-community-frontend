@@ -3,6 +3,7 @@ import ProfileUpload from "../../components/profile-upload/ProfileUpload.js";
 import Button from "../../components/button/Button.js";
 import { navigate } from "../../main.js";
 import { signUp } from "../../api/memberApi.js";
+import { showToast } from "../../utils/showToast.js"; 
 
 export default function SignupPage() {
   const container = document.createElement("div");
@@ -17,6 +18,7 @@ export default function SignupPage() {
   });
   container.appendChild(profileUpload.render());
 
+  // 이메일 입력 필드
   const emailField = new InputField({
     id: "email",
     label: "이메일*",
@@ -29,6 +31,7 @@ export default function SignupPage() {
   });
   container.appendChild(emailField.render());
 
+  // 비밀번호 입력 필드
   const passwordField = new InputField({
     id: "password",
     label: "비밀번호*",
@@ -44,6 +47,7 @@ export default function SignupPage() {
   });
   container.appendChild(passwordField.render());
 
+  // 비밀번호 확인 입력 필드
   const passwordConfirmField = new InputField({
     id: "passwordConfirm",
     label: "비밀번호 확인*",
@@ -59,6 +63,7 @@ export default function SignupPage() {
   });
   container.appendChild(passwordConfirmField.render());
 
+  // 닉네임 입력 필드
   const nicknameField = new InputField({
     id: "nickname",
     label: "닉네임*",
@@ -68,17 +73,15 @@ export default function SignupPage() {
     requiredMessage: "닉네임을 입력하세요.",
   });
   container.appendChild(nicknameField.render());
-  const message =
-    document.querySelector(".message") || document.createElement("p");
-  message.className = "message";
-  message.style.marginTop = "12px";
 
+  // 회원가입 버튼
   const signupButton = new Button({
     text: "회원가입",
     className: "primary",
     width: "320px",
     onClick: async (e) => {
       e.preventDefault();
+
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
       const confirmPassword = document
@@ -86,23 +89,19 @@ export default function SignupPage() {
         .value.trim();
       const nickname = document.getElementById("nickname").value.trim();
 
-      if (!email || !password || !passwordConfirm || !nickname) {
-        message.textContent = "모든 필드를 입력하세요.";
-        message.style.color = "red";
+      // 필수 입력 확인
+      if (!email || !password || !confirmPassword || !nickname) {
+        showToast("모든 필드를 입력하세요.");
         return;
       }
 
-      if (!container.contains(message)) container.appendChild(message);
-
       if (password !== confirmPassword) {
-        message.textContent = "비밀번호가 일치하지 않습니다.";
-        message.style.color = "red";
+        showToast("비밀번호가 일치하지 않습니다.");
         return;
       }
 
       try {
         const { ok, data } = await signUp({
-          //  회원가입 API 호출
           email,
           nickname,
           password,
@@ -110,31 +109,27 @@ export default function SignupPage() {
         });
 
         if (!ok) {
-          message.textContent = data.message || "서버 오류가 발생했습니다.";
-          message.style.color = "red";
+          showToast(data.message || "서버 오류가 발생했습니다.");
           return;
         }
 
         if (data.isSuccess === false) {
-          message.textContent = data.message || "회원가입 실패";
-          message.style.color = "red";
+          showToast(data.message || "회원가입 실패");
           return;
         }
 
-        message.textContent = "회원가입 성공! 로그인 페이지로 이동합니다.";
-        message.style.color = "green";
+        showToast("회원가입 성공! 로그인 페이지로 이동합니다.");
 
-        // 1초 후 로그인 페이지로 이동
         setTimeout(() => navigate("/login"), 1000);
       } catch (err) {
         console.error("회원가입 요청 실패:", err);
-        message.textContent = err.message || "서버와 연결할 수 없습니다.";
-        message.style.color = "red";
+        showToast(err.message || "서버와 연결할 수 없습니다.");
       }
     },
   });
   container.appendChild(signupButton.render());
 
+  // 로그인 페이지 이동 버튼
   const goLogin = new Button({
     text: "로그인하러 가기",
     className: "text",
