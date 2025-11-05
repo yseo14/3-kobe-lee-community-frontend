@@ -23,8 +23,23 @@ export function deleteMember() {
   });
 }
 
+// 내 정보 조회
 export function getMyInfo(){
   return apiRequest("/member", {
+    method: "GET",
+  });
+}
+
+// 이메일 중복 검사
+export function checkEmailDuplicate(email) {
+  return apiRequest(`/member/email?email=${encodeURIComponent(email)}`, {
+    method: "GET",
+  });
+}
+
+// 닉네임 중복 검사
+export function checkNicknameDuplicate(nickname) {
+  return apiRequest(`/member/nickname?nickname=${encodeURIComponent(nickname)}`, {
     method: "GET",
   });
 }

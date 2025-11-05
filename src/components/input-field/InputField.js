@@ -11,6 +11,7 @@ export default class InputField {
     invalidMessage = "",
     width = "320px",
     height = null,
+    onBlur = null,
   }) {
     this.id = id;
     this.label = label;
@@ -23,6 +24,7 @@ export default class InputField {
     this.invalidMessage = invalidMessage;
     this.width = width;
     this.height = height;
+    this.onBlur = onBlur; // 외부에서 전달받은 추가적인 onBlur 콜백 (필수값 외에 중복검사 같은 것)
   }
 
   render() {
@@ -34,7 +36,6 @@ export default class InputField {
     labelEl.setAttribute("for", this.id);
     labelEl.textContent = this.label;
 
-    // type이 "textarea"일 경우 textarea 생성
     const inputEl =
       this.type === "textarea"
         ? document.createElement("textarea")
@@ -44,10 +45,7 @@ export default class InputField {
     inputEl.id = this.id;
     inputEl.placeholder = this.placeholder;
 
-    // type이 input일 때만 type 속성 부여
     if (this.type !== "textarea") inputEl.type = this.type;
-
-    // width / height 반영
     inputEl.style.width = this.width;
     if (this.height) inputEl.style.height = this.height;
 
@@ -55,11 +53,8 @@ export default class InputField {
     helperEl.className = "helper-text";
     helperEl.textContent = this.helperText;
 
-    wrapper.appendChild(labelEl);
-    wrapper.appendChild(inputEl);
-    wrapper.appendChild(helperEl);
+    wrapper.append(labelEl, inputEl, helperEl);
 
-    // Helper 표시/숨김 함수
     this.showHelper = (message) => {
       helperEl.textContent = message;
       helperEl.classList.add("show");
@@ -73,12 +68,7 @@ export default class InputField {
     this.inputEl = inputEl;
     this.helperEl = helperEl;
 
-    // focus/blur 기반 검증 자동 적용
-    inputEl.addEventListener("focus", () => {
-      this.hideHelper();
-    });
-
-    inputEl.addEventListener("blur", () => {
+    inputEl.addEventListener("blur", async (e) => {
       const value = inputEl.value.trim();
 
       // 필수값 검증
@@ -96,7 +86,19 @@ export default class InputField {
       }
 
       this.hideHelper();
+
+      // 외부 onBlur 콜백이 있을 경우 추가 실행
+      if (typeof this.onBlur === "function") {
+        try {
+          await this.onBlur(e);
+        } catch (err) {
+          console.error("InputField onBlur error:", err);
+        }
+      }
     });
+
+    // focus 시 helper 숨기기
+    inputEl.addEventListener("focus", () => this.hideHelper());
 
     return wrapper;
   }

@@ -3,7 +3,11 @@ import ProfileUpload from "../../components/profile-upload/ProfileUpload.js";
 import Button from "../../components/button/Button.js";
 import { navigate } from "../../main.js";
 import { signUp } from "../../api/memberApi.js";
-import { showToast } from "../../utils/showToast.js"; 
+import { showToast } from "../../utils/showToast.js";
+import {
+  checkEmailDuplicate,
+  checkNicknameDuplicate,
+} from "../../api/memberApi.js";
 
 export default function SignupPage() {
   const container = document.createElement("div");
@@ -28,6 +32,29 @@ export default function SignupPage() {
     requiredMessage: "이메일을 입력하세요.",
     validateFn: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
     invalidMessage: "올바른 이메일 주소 형식을 입력해주세요.",
+    onBlur: async (e) => {
+      const email = e.target.value.trim();
+      if (!email) return;
+
+      try {
+        const { ok, data } = await checkEmailDuplicate(email);
+
+        if (ok && data.isSuccess) {
+          if (!data.result.available) {
+            showToast("이미 사용 중인 이메일입니다.");
+            emailField.showHelper("이미 등록된 이메일이에요.");
+          } else {
+            showToast("사용 가능한 이메일입니다.");
+            emailField.hideHelper();
+          }
+        } else {
+          showToast(data?.message || "이메일 중복 확인 실패");
+        }
+      } catch (err) {
+        console.error("이메일 중복 확인 실패:", err);
+        showToast("서버 오류로 이메일 확인에 실패했습니다.");
+      }
+    },
   });
   container.appendChild(emailField.render());
 
@@ -71,8 +98,32 @@ export default function SignupPage() {
     placeholder: "닉네임을 입력하세요",
     required: true,
     requiredMessage: "닉네임을 입력하세요.",
+    onBlur: async (e) => {
+      const nickname = e.target.value.trim();
+      if (!nickname) return;
+
+      try {
+        const { ok, data } = await checkNicknameDuplicate(nickname);
+
+        if (ok && data.isSuccess) {
+          if (!data.result.available) {
+            showToast("이미 사용 중인 닉네임입니다.");
+            nicknameField.showHelper("이미 등록된 닉네임이에요.");
+          } else {
+            showToast("사용 가능한 닉네임입니다.");
+            nicknameField.hideHelper();
+          }
+        } else {
+          showToast(data?.message || "닉네임 중복 확인 실패");
+        }
+      } catch (err) {
+        console.error("닉네임 중복 확인 실패:", err);
+        showToast("서버 오류로 닉네임 확인에 실패했습니다.");
+      }
+    },
   });
   container.appendChild(nicknameField.render());
+
 
   // 회원가입 버튼
   const signupButton = new Button({
