@@ -31,3 +31,12 @@ export function deleteComment(postId, commentId) {
     method: "DELETE",
   });
 }
+
+// 댓글 수정 
+export function updateComment(postId, commentId, content) {
+  return apiRequest(`/post/${postId}/comment/${commentId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content }),
+  });
+}

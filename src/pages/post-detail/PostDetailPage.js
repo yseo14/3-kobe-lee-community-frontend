@@ -6,8 +6,8 @@ import { deletePost } from "../../api/postApi.js";
 import { showToast } from "../../utils/showToast.js";
 import Modal from "../../components/modal/modal.js";
 import { createComment } from "../../api/commentApi.js";
-import { deleteComment } from '../../api/commentApi.js';
-
+import { deleteComment } from "../../api/commentApi.js";
+import { updateComment } from "../../api/commentApi.js";
 
 export default function PostDetailPage(postIdFromRoute) {
   const container = document.createElement("div");
@@ -236,13 +236,82 @@ export default function PostDetailPage(postIdFromRoute) {
         const actions = document.createElement("div");
         actions.className = "comment-actions";
 
+        const content = document.createElement("p");
+        content.className = "comment-content";
+        content.textContent = c.content;
+
+        let isEditing = false; // ✅ 수정 모드 상태 관리
+        let inputEl; // 수정 input 참조용
+
+        // 수정 클릭
         if (c.viewerCanEdit) {
           const editBtn = new Button({
             text: "수정",
             className: "secondary-outline",
-            onClick: () => console.log("댓글 수정 클릭", c.commentId),
-            width: "60px",
-            height: "28px",
+            onClick: () => {
+              if (isEditing) return;
+
+              // 수정 모드 진입
+              isEditing = true;
+              content.innerHTML = "";
+
+              inputEl = document.createElement("textarea");
+              inputEl.className = "comment-edit-input";
+              inputEl.value = c.content;
+
+              content.appendChild(inputEl);
+
+              actions.innerHTML = ""; // 버튼 영역 리셋
+
+              // 확인 버튼
+              const confirmBtn = new Button({
+                text: "확인",
+                className: "primary",
+                height: "28px",
+                onClick: async () => {
+                  const newContent = inputEl.value.trim();
+                  if (!newContent) {
+                    showToast("내용을 입력해주세요.");
+                    return;
+                  }
+
+                  try {
+                    const { ok, data } = await updateComment(
+                      postId,
+                      c.commentId,
+                      newContent
+                    );
+
+                    if (ok && data.isSuccess) {
+                      showToast("댓글이 수정되었습니다!");
+
+                      // 수정 반영
+                      c.content = newContent;
+                      isEditing = false;
+                      renderComments(comments);
+                    } else {
+                      showToast(data?.message || "댓글 수정에 실패했습니다.");
+                    }
+                  } catch (err) {
+                    console.error("댓글 수정 실패:", err);
+                    showToast("서버 오류로 댓글 수정에 실패했습니다.");
+                  }
+                },
+              }).render();
+
+              // 취소 버튼
+              const cancelBtn = new Button({
+                text: "취소",
+                className: "secondary-outline",
+                height: "28px",
+                onClick: () => {
+                  isEditing = false;
+                  renderComments(comments); // 원래 상태로 복원
+                },
+              }).render();
+
+              actions.append(confirmBtn, cancelBtn);
+            },
           }).render();
           actions.appendChild(editBtn);
         }
@@ -291,10 +360,6 @@ export default function PostDetailPage(postIdFromRoute) {
         }
 
         top.append(topLeft, actions);
-
-        const content = document.createElement("p");
-        content.className = "comment-content";
-        content.textContent = c.content;
 
         item.append(top, content);
         commentList.appendChild(item);
