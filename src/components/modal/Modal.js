@@ -1,4 +1,4 @@
-import Button from "../button/Button.js";
+import Button from "/src/components/button/Button.js";
 
 export default class Modal {
   constructor({

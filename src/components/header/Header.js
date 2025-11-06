@@ -1,5 +1,5 @@
-import Button from "../../components/button/Button.js";
-import { navigate } from "../../main.js";
+import Button from "/src/components/button/Button.js";
+import { navigate } from "/src/main.js";
 
 export default function Header({
   title,

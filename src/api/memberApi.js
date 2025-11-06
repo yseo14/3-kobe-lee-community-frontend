@@ -1,4 +1,4 @@
-import { apiRequest } from "./api.js";
+import { apiRequest } from "/src/api/api.js";
 
 export function signUp(body) {
   return apiRequest("/member", {

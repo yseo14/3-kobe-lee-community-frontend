@@ -1,4 +1,4 @@
-import { BASE_URL } from "../config/apiConfig.js";
+import {BASE_URL} from "/src/config/apiConfig.js";
 
 export async function apiRequest(endpoint, options = {}) {
   const url = `${BASE_URL}${endpoint}`;

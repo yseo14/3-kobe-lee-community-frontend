@@ -1,6 +1,6 @@
-import InputField from "../input-field/InputField.js";
-import Button from "../button/Button.js";
-import { showToast } from "../../utils/showToast.js";
+import InputField from "/src/components/input-field/InputField.js";
+import Button from "/src/components/button/Button.js";
+import { showToast } from "/src/utils/showToast.js";
 
 export default function PostForm({
   mode = "create",

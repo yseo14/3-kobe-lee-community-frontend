@@ -1,12 +1,12 @@
-import Header from "./components/header/Header.js";
-import LoginPage from "./pages/login/LoginPage.js";
-import SignupPage from "./pages/signup/SignupPage.js";
-import PostListPage from "./pages/post-list/PostListPage.js";
-import EditProfilePage from "./pages/edit-profile/EditProfilePage.js";
-import PostCreatePage from "./pages/post/PostCreatePage.js";
-import Footer from "./components/footer/Footer.js";
-import PostDetailPage from "./pages/post-detail/PostDetailPage.js";
-import PostEditPage from "./pages/post/PostEditPage.js";
+import Header from "/src/components/header/Header.js";
+import LoginPage from "/src/pages/login/LoginPage.js";
+import SignupPage from "/src/pages/signup/SignupPage.js";
+import PostListPage from "/src/pages/post-list/PostListPage.js";
+import EditProfilePage from "/src/pages/edit-profile/EditProfilePage.js";
+import PostCreatePage from "/src/pages/post/PostCreatePage.js";
+import Footer from "/src/components/footer/Footer.js";
+import PostDetailPage from "/src/pages/post-detail/PostDetailPage.js";
+import PostEditPage from "/src/pages/post/PostEditPage.js";
 
 export const appState = {
   pageData: null,

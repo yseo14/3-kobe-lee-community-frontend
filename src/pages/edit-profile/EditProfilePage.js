@@ -1,9 +1,9 @@
-import InputField from "../../components/input-field/InputField.js";
-import ProfileUpload from "../../components/profile-upload/ProfileUpload.js";
-import Button from "../../components/button/Button.js";
-import { navigate } from "../../main.js";
-import { getMyInfo, updateMember, deleteMember } from "../../api/memberApi.js";
-import { showToast } from "../../utils/showToast.js";
+import InputField from "/src/components/input-field/InputField.js";
+import ProfileUpload from "/src/components/profile-upload/ProfileUpload.js";
+import Button from "/src/components/button/Button.js";
+import { navigate } from "/src/main.js";
+import { getMyInfo, updateMember, deleteMember } from "/src/api/memberApi.js";
+import { showToast } from "/src/utils/showToast.js";
 
 export default function EditProfilePage(userData) {
   const container = document.createElement("div");

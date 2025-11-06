@@ -1,7 +1,7 @@
-import InputField from "../../components/input-field/InputField.js";
-import Button from "../../components/button/Button.js";
-import { showToast } from "../../utils/showToast.js";
-import { createPost } from '../../api/postApi.js';
+import InputField from "/src/components/input-field/InputField.js";
+import Button from "/src/components/button/Button.js";
+import { showToast } from "/src/utils/showToast.js";
+import { createPost } from '/src/api/postApi.js';
 
 export default function PostCreatePage() {
   const container = document.createElement("div");

@@ -1,4 +1,4 @@
-import { apiRequest } from "./api.js";
+import { apiRequest } from "/src/api/api.js";
 
 // 이용약관
 export function getTerms() {

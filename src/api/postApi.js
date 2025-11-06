@@ -1,4 +1,4 @@
-import { apiRequest } from "./api.js";
+import { apiRequest } from "/src/api/api.js";
 
 export function createPost(body) {
   return apiRequest("/post", {

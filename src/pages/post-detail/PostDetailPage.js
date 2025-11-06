@@ -1,13 +1,13 @@
-import Button from "../../components/button/Button.js";
-import { fetchPostDetail } from "../../api/postApi.js";
-import { fetchComments } from "../../api/commentApi.js";
-import { navigate } from "../../main.js";
-import { deletePost } from "../../api/postApi.js";
-import { showToast } from "../../utils/showToast.js";
-import Modal from "../../components/modal/modal.js";
-import { createComment } from "../../api/commentApi.js";
-import { deleteComment } from "../../api/commentApi.js";
-import { updateComment } from "../../api/commentApi.js";
+import Button from "/src/components/button/Button.js";
+import { fetchPostDetail } from "/src/api/postApi.js";
+import { fetchComments } from "/src/api/commentApi.js";
+import { navigate } from "/src/main.js";
+import { deletePost } from "/src/api/postApi.js";
+import { showToast } from "/src/utils/showToast.js";
+import Modal from "/src/components/modal/modal.js";
+import { createComment } from "/src/api/commentApi.js";
+import { deleteComment } from "/src/api/commentApi.js";
+import { updateComment } from "/src/api/commentApi.js";
 
 export default function PostDetailPage(postIdFromRoute) {
   const container = document.createElement("div");
