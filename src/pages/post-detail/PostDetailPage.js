@@ -4,7 +4,7 @@ import { fetchComments } from "/src/api/commentApi.js";
 import { navigate } from "/src/main.js";
 import { deletePost } from "/src/api/postApi.js";
 import { showToast } from "/src/utils/showToast.js";
-import Modal from "/src/components/modal/modal.js";
+import Modal from "/src/components/modal/Modal.js";
 import { createComment } from "/src/api/commentApi.js";
 import { deleteComment } from "/src/api/commentApi.js";
 import { updateComment } from "/src/api/commentApi.js";

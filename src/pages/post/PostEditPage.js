@@ -1,7 +1,7 @@
-import PostForm from "../../components/post-form/Postform.js";
-import { fetchPostDetail, updatePost } from "../../api/postApi.js";
-import { showToast } from "../../utils/showToast.js";
-import { navigate } from '../../main.js';
+import PostForm from "/src/components/post-form/Postform.js";
+import { fetchPostDetail, updatePost } from "/src/api/postApi.js";
+import { showToast } from "/src/utils/showToast.js";
+import { navigate } from '/src/main.js';
 
 export default function PostEditPage(postIdFromRoute) {
   const container = document.createElement("div");
