@@ -1,4 +1,4 @@
-import PostForm from "/src/components/post-form/Postform.js";
+import PostForm from "/src/components/post-form/PostForm.js";
 import { fetchPostDetail, updatePost } from "/src/api/postApi.js";
 import { showToast } from "/src/utils/showToast.js";
 import { navigate } from '/src/main.js';
