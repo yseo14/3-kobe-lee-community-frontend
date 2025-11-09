@@ -1,4 +1,4 @@
-import { BASE_URL } from "/src/api/apiconfig.js";
+import { BASE_URL } from "/src/config/apiConfig.js";
 
 export default function Footer() {
   const footer = document.createElement("footer");
