@@ -1,7 +1,11 @@
-import {BASE_URL} from "/src/config/apiConfig.js";
+import { BASE_URL } from "/src/config/apiConfig.js";
 
 export async function apiRequest(endpoint, options = {}) {
-  const url = `${BASE_URL}${endpoint}`;
+  const normalizedEndpoint = endpoint.startsWith("/api")
+    ? endpoint
+    : `/api${endpoint}`;
+
+  const url = `${BASE_URL}${normalizedEndpoint}`;
 
   const token = sessionStorage.getItem("accessToken");
 
@@ -56,9 +60,8 @@ export async function apiRequest(endpoint, options = {}) {
   }
 }
 
-
 /**
- * 토큰 재발급을 시도하는 메서드 
+ * 토큰 재발급을 시도하는 메서드
  * 서버에서 클라이언트의 refresh token을 확인해야하므로 Http Only 쿠키를 동봉한다.
  * @returns 재발급 성공: true, 실패: false
  */
@@ -82,7 +85,7 @@ async function tryRefreshToken() {
       console.error("Refresh 응답에 accessToken이 없습니다.");
       return false;
     }
-    
+
     // access toke 재발급 후 세션 스토리지에 저장
     sessionStorage.setItem("accessToken", newAccessToken);
     console.info("Access token successfully refreshed.");
