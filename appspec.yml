@@ -1,0 +1,24 @@
+version: 0.0
+os: linux
+files:
+  # 1. 실행 스크립트 복사
+  - source: scripts/start_server.sh
+    destination: /home/ubuntu/scripts
+    overwrite: true
+
+  # 2. Docker Compose 파일 복사
+  - source: docker-compose.yml
+    destination: /home/ubuntu/frontend
+    overwrite: true
+
+permissions:
+  - object: /home/ubuntu/scripts/start_server.sh
+    mode: 755
+    owner: ubuntu
+    group: ubuntu
+
+hooks:
+  ApplicationStart:
+    - location: scripts/start_server.sh
+      timeout: 300
+      runas: ubuntu

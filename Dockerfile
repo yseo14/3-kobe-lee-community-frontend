@@ -1,22 +1,21 @@
-# Node.js 22 기반의 공식 이미지를 사용
+# 1. Node.js 22 Alpine (최신 버전 사용 좋음)
 FROM node:22-alpine
 
-# 작업 디렉토리를 /app으로 설정
+# 2. 작업 디렉토리 설정
 WORKDIR /app
 
-# 의존성 설치 단계의 캐시 활용을 위해 패키지 파일을 먼저 복사
-# package.json과 package-lock.json 파일을 현재 작업 디렉토리(./)로 복사
-COPY package.json package-lock.json ./
+# 3. 의존성 파일 복사
+COPY package*.json ./
 
-# npm을 사용하여 종속성을 설치
-RUN npm install
+# 4. [핵심 변경] 개발용 의존성 제외하고 설치 (용량/속도 최적화)
+# npm install 대신 npm ci 사용
+RUN npm ci --only=production
 
-# 현재 디렉토리의 모든 파일을 Docker 이미지 내의 작업 디렉토리(WORKDIR)로 복사
-#  두 번째 점(.)은 이미지 내의 현재 작업 디렉토리, 즉 WORKDIR로 지정된 위치를 의미
+# 5. 소스 코드 복사
 COPY . .
 
-# 애플리케이션이 사용할 포트를 노출
+# 6. 포트 노출
 EXPOSE 3000
 
-# 컨테이너가 실행될 때 앱을 시작
-CMD ["npm", "start"]
+# 7. npm 프로세스 없이 Node 직접 실행 (안정성)
+CMD ["node", "server/app.js"]

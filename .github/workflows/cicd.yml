@@ -1,0 +1,102 @@
+name: Node.js CI/CD Pipeline
+
+on:
+  push:
+    branches: release
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+  CODE_DEPLOY_APP_NAME: ${{ secrets.CODE_DEPLOY_APP_NAME }}
+  DEPLOYMENT_GROUP_NAME: ${{ secrets.DEPLOYMENT_GROUP_NAME }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # JOB 1: CI (테스트)
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm ci
+      - run: npm test
+
+  # JOB 2: Build & Push (이미지 -> ECR)
+  build-image:
+    needs: ci
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.image-meta.outputs.tag }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - uses: docker/setup-buildx-action@v2
+
+      - id: image-meta
+        run: echo "tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Build and Push to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.image-meta.outputs.tag }}
+        run: |
+          docker buildx build --platform linux/amd64 \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            --push .
+
+  # JOB 3: Deploy (설정파일 -> S3 -> CodeDeploy)
+  deploy:
+    needs: build-image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Prepare & Upload Scripts
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ needs.build-image.outputs.image_tag }}
+          # sed 명령어에서 쓰기 위해 환경변수 재정의
+          ECR_REPO: ${{ env.ECR_REPOSITORY }}
+        run: |
+          # 1. start_server.sh 내용 치환 (플레이스홀더 -> 실제값)
+          sed -i "s|__ECR_REGISTRY__|$ECR_REGISTRY|g" scripts/start_server.sh
+          sed -i "s|__ECR_REPOSITORY__|$ECR_REPO|g" scripts/start_server.sh
+          sed -i "s|__IMAGE_TAG__|$IMAGE_TAG|g" scripts/start_server.sh
+
+          # 2. 필요한 파일들 압축 (docker-compose.yml 포함)
+          zip -r deploy.zip appspec.yml scripts docker-compose.yml
+
+          # 3. S3 업로드
+          aws s3 cp deploy.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
+
+      - name: Trigger CodeDeploy
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
+            --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }} \
+            --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$GITHUB_SHA.zip
