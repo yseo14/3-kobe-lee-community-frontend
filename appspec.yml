@@ -12,6 +12,11 @@ files:
     overwrite: true
 
 permissions:
+  - object: /home/ubuntu/frontend
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+
   - object: /home/ubuntu/scripts/start_server.sh
     mode: 755
     owner: ubuntu
