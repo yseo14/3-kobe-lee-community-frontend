@@ -1,12 +1,17 @@
 version: 0.0
 os: linux
 files:
-  # 1. 실행 스크립트 복사
+  # 실행 스크립트 복사
   - source: scripts/start_server.sh
     destination: /home/ubuntu/scripts
     overwrite: true
 
-  # 2. Docker Compose 파일 복사
+  # 권한 수정 스크립트 복사
+  - source: scripts/change_permissions.sh
+    destination: /home/ubuntu/scripts
+    overwrite: true
+
+  # Docker Compose 파일 복사
   - source: docker-compose.yml
     destination: /home/ubuntu/frontend
     overwrite: true
@@ -16,13 +21,15 @@ permissions:
     pattern: "**"
     owner: ubuntu
     group: ubuntu
-
-  - object: /home/ubuntu/scripts/start_server.sh
     mode: 755
-    owner: ubuntu
-    group: ubuntu
 
 hooks:
+  # 파일 설치 직후(AfterInstall)에 실행
+  AfterInstall:
+    - location: scripts/change_permissions.sh
+      timeout: 60
+      runas: root
+
   ApplicationStart:
     - location: scripts/start_server.sh
       timeout: 300
