@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 3000
 
 # 7. npm 프로세스 없이 Node 직접 실행 (안정성)
-CMD ["node", "server/app.js"]
+CMD ["node", "server/server.js"]
