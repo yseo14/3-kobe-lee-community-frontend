@@ -92,11 +92,11 @@ jobs:
           zip -r deploy.zip appspec.yml scripts docker-compose.yml
 
           # 3. S3 업로드
-          aws s3 cp deploy.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
+          aws s3 cp deploy.zip s3://$S3_BUCKET_NAME/frontend/$GITHUB_SHA.zip
 
       - name: Trigger CodeDeploy
         run: |
           aws deploy create-deployment \
             --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
             --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }} \
-            --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$GITHUB_SHA.zip
+            --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=frontend/$GITHUB_SHA.zip
