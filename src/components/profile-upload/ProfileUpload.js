@@ -1,3 +1,5 @@
+import { uploadProfileImage } from "/src/api/uploadApi.js";
+
 export default class ProfileUpload {
   constructor({
     id = "profile-upload",
@@ -8,6 +10,7 @@ export default class ProfileUpload {
     this.label = label;
     this.helperText = helperText;
     this.imageData = null; // 업로드된 이미지 저장용
+    this.objectKey = null; // 업로드된 이미지의 objectKey 저장용
   }
 
   render() {
@@ -42,9 +45,10 @@ export default class ProfileUpload {
 
     uploadArea.addEventListener("click", () => fileInput.click());
 
-    fileInput.addEventListener("change", (e) => {
+    fileInput.addEventListener("change", async (e) => {
       const file = e.target.files[0];
       if (file) {
+        // 이미지 미리보기
         const reader = new FileReader();
         reader.onload = (event) => {
           uploadArea.innerHTML = ""; // 기존 "+" 제거
@@ -54,6 +58,27 @@ export default class ProfileUpload {
           this.imageData = event.target.result; // 저장
         };
         reader.readAsDataURL(file);
+
+        // 이미지 업로드 API 호출
+        try {
+          console.log("[ProfileUpload] 이미지 업로드 시작");
+          const { ok, data } = await uploadProfileImage(file);
+          console.log("[ProfileUpload] 업로드 응답:", { ok, data });
+          
+          if (ok && data.status === 201 && data.data && data.data.length > 0) {
+            this.objectKey = data.data[0].objectKey;
+            console.log("[ProfileUpload] objectKey 저장됨:", this.objectKey);
+            this.hideHelper();
+          } else {
+            console.warn("[ProfileUpload] 업로드 실패 - 응답 형식이 올바르지 않음:", { ok, data });
+            this.showHelper("이미지 업로드에 실패했습니다.");
+            this.objectKey = null;
+          }
+        } catch (err) {
+          console.error("[ProfileUpload] 이미지 업로드 실패:", err);
+          this.showHelper("이미지 업로드에 실패했습니다.");
+          this.objectKey = null;
+        }
       }
     });
 
@@ -67,6 +92,10 @@ export default class ProfileUpload {
     };
 
     this.getImage = () => this.imageData;
+    this.getObjectKey = () => {
+      console.log("[ProfileUpload] getObjectKey 호출됨, 현재 objectKey:", this.objectKey);
+      return this.objectKey;
+    };
 
     wrapper.appendChild(labelEl);
     wrapper.appendChild(helperEl);
