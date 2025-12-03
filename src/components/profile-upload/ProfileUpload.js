@@ -5,10 +5,12 @@ export default class ProfileUpload {
     id = "profile-upload",
     label = "프로필 사진",
     helperText = "",
+    currentImageUrl = null, // 현재 프로필 이미지 URL
   }) {
     this.id = id;
     this.label = label;
     this.helperText = helperText;
+    this.currentImageUrl = currentImageUrl;
     this.imageData = null; // 업로드된 이미지 저장용
     this.objectKey = null; // 업로드된 이미지의 objectKey 저장용
   }
@@ -39,8 +41,23 @@ export default class ProfileUpload {
     fileInput.accept = "image/*";
     fileInput.hidden = true;
 
-    // upload Area에 이미지, + 기호 붙이기
-    uploadArea.appendChild(plusIcon);
+    // 현재 프로필 이미지가 있으면 표시, 없으면 + 아이콘 표시
+    if (this.currentImageUrl) {
+      const currentImg = document.createElement("img");
+      currentImg.src = this.currentImageUrl;
+      uploadArea.appendChild(currentImg);
+      
+      // 편집 가능하다는 것을 알려주는 오버레이 추가
+      const editOverlay = document.createElement("div");
+      editOverlay.className = "edit-overlay";
+      const editIcon = document.createElement("span");
+      editIcon.className = "edit-icon";
+      editIcon.textContent = "✎"; // 편집 아이콘
+      editOverlay.appendChild(editIcon);
+      uploadArea.appendChild(editOverlay);
+    } else {
+      uploadArea.appendChild(plusIcon);
+    }
     uploadArea.appendChild(fileInput);
 
     uploadArea.addEventListener("click", () => fileInput.click());
@@ -51,10 +68,20 @@ export default class ProfileUpload {
         // 이미지 미리보기
         const reader = new FileReader();
         reader.onload = (event) => {
-          uploadArea.innerHTML = ""; // 기존 "+" 제거
+          uploadArea.innerHTML = ""; // 기존 내용 제거
           const img = document.createElement("img");
           img.src = event.target.result;
           uploadArea.appendChild(img);
+          
+          // 편집 오버레이도 새 이미지에 추가
+          const editOverlay = document.createElement("div");
+          editOverlay.className = "edit-overlay";
+          const editIcon = document.createElement("span");
+          editIcon.className = "edit-icon";
+          editIcon.textContent = "✎";
+          editOverlay.appendChild(editIcon);
+          uploadArea.appendChild(editOverlay);
+          
           this.imageData = event.target.result; // 저장
         };
         reader.readAsDataURL(file);

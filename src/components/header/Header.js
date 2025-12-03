@@ -139,6 +139,29 @@ export default function Header({
     right.style.display = showProfile ? "flex" : "none";
   };
 
+  // 프로필 이미지를 새로고침하는 메서드
+  header.refreshProfileImage = async () => {
+    try {
+      const { ok, data } = await getMyInfo();
+      if (ok && data.isSuccess && data.result) {
+        const userData = data.result;
+        
+        // profileImageKey가 있는 경우 S3 이미지 URL 구성
+        if (userData.profileImageKey) {
+          const userProfileImageUrl = getS3ImageUrl(userData.profileImageKey);
+          if (userProfileImageUrl) {
+            updateProfileImage(userProfileImageUrl);
+          }
+        } else {
+          // 프로필 이미지가 없으면 기본 이미지로 변경
+          updateProfileImage("/assets/images/default_profile.png");
+        }
+      }
+    } catch (err) {
+      console.error("프로필 이미지 새로고침 실패:", err);
+    }
+  };
+
   // 초기 상태 설정
   header.update({ title, showBack, showProfile });
 
