@@ -8,6 +8,7 @@ import Modal from "/src/components/modal/Modal.js";
 import { createComment } from "/src/api/commentApi.js";
 import { deleteComment } from "/src/api/commentApi.js";
 import { updateComment } from "/src/api/commentApi.js";
+import { getS3ImageUrl } from "/src/config/appConfig.js";
 
 export default function PostDetailPage(postIdFromRoute) {
   const container = document.createElement("div");
@@ -128,12 +129,87 @@ export default function PostDetailPage(postIdFromRoute) {
 
     authorRow.append(authorLeft, actions);
 
-    // 이미지 (더미)
+    // 이미지 캐러셀
     const imageWrapper = document.createElement("div");
     imageWrapper.className = "post-image-wrapper";
-    const img = document.createElement("img");
-    img.src = "https://placehold.co/600x300";
-    imageWrapper.appendChild(img);
+    
+    // imageKeyList가 있고 길이가 0보다 큰 경우에만 이미지 표시
+    if (post.imageKeyList && post.imageKeyList.length > 0) {
+      let currentImageIndex = 0;
+      
+      // 이미지 컨테이너
+      const imageContainer = document.createElement("div");
+      imageContainer.className = "post-image-container";
+      
+      // 이미지 슬라이드
+      const imageSlide = document.createElement("div");
+      imageSlide.className = "post-image-slide";
+      imageSlide.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+      
+      post.imageKeyList.forEach((imageKey) => {
+        const imgWrapper = document.createElement("div");
+        imgWrapper.className = "post-image-item";
+        const img = document.createElement("img");
+        img.src = getS3ImageUrl(imageKey);
+        img.alt = "게시글 이미지";
+        imgWrapper.appendChild(img);
+        imageSlide.appendChild(imgWrapper);
+      });
+      
+      imageContainer.appendChild(imageSlide);
+      
+      // 이전/다음 버튼 (이미지가 2개 이상일 때만 표시)
+      if (post.imageKeyList.length > 1) {
+        // 인디케이터 (점 표시)
+        const indicators = document.createElement("div");
+        indicators.className = "image-indicators";
+        
+        // 인디케이터 업데이트 함수
+        const updateIndicators = () => {
+          indicators.innerHTML = "";
+          post.imageKeyList.forEach((_, index) => {
+            const dot = document.createElement("button");
+            dot.className = `image-indicator ${index === currentImageIndex ? "active" : ""}`;
+            dot.setAttribute("aria-label", `${index + 1}번째 이미지`);
+            dot.addEventListener("click", () => {
+              currentImageIndex = index;
+              imageSlide.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+              updateIndicators();
+            });
+            indicators.appendChild(dot);
+          });
+        };
+        
+        // 이전 버튼
+        const prevBtn = document.createElement("button");
+        prevBtn.className = "image-nav-btn image-nav-prev";
+        prevBtn.innerHTML = "◀";
+        prevBtn.setAttribute("aria-label", "이전 이미지");
+        prevBtn.addEventListener("click", () => {
+          currentImageIndex = (currentImageIndex - 1 + post.imageKeyList.length) % post.imageKeyList.length;
+          imageSlide.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+          updateIndicators();
+        });
+        
+        // 다음 버튼
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "image-nav-btn image-nav-next";
+        nextBtn.innerHTML = "▶";
+        nextBtn.setAttribute("aria-label", "다음 이미지");
+        nextBtn.addEventListener("click", () => {
+          currentImageIndex = (currentImageIndex + 1) % post.imageKeyList.length;
+          imageSlide.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+          updateIndicators();
+        });
+        
+        imageContainer.appendChild(prevBtn);
+        imageContainer.appendChild(nextBtn);
+        updateIndicators();
+        imageContainer.appendChild(indicators);
+      }
+      
+      imageWrapper.appendChild(imageContainer);
+    }
 
     // 본문 내용
     const content = document.createElement("div");
@@ -149,7 +225,13 @@ export default function PostDetailPage(postIdFromRoute) {
       <div><strong>${post.commentCount}</strong> 댓글</div>
     `;
 
-    mainSection.append(title, authorRow, imageWrapper, content, stats);
+    // 이미지가 있는 경우에만 imageWrapper 추가
+    const elementsToAppend = [title, authorRow];
+    if (post.imageKeyList && post.imageKeyList.length > 0) {
+      elementsToAppend.push(imageWrapper);
+    }
+    elementsToAppend.push(content, stats);
+    mainSection.append(...elementsToAppend);
   };
 
   // 댓글 렌더링
