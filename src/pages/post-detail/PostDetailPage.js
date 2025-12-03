@@ -61,8 +61,14 @@ export default function PostDetailPage(postIdFromRoute) {
     const authorLeft = document.createElement("div");
     authorLeft.className = "author-left";
 
-    const profile = document.createElement("div");
-    profile.className = "profile-placeholder";
+    const profile = document.createElement("img");
+    profile.className = "profile-image";
+    if (post.profileImageKey) {
+      profile.src = getS3ImageUrl(post.profileImageKey);
+    } else {
+      profile.src = "/assets/images/default_profile.png";
+    }
+    profile.alt = "프로필 이미지";
 
     const authorName = document.createElement("span");
     authorName.className = "author-name";
@@ -301,8 +307,14 @@ export default function PostDetailPage(postIdFromRoute) {
         const topLeft = document.createElement("div");
         topLeft.className = "comment-top-left";
 
-        const profile = document.createElement("div");
-        profile.className = "profile-placeholder";
+        const profile = document.createElement("img");
+        profile.className = "profile-image";
+        if (c.profileImage) {
+          profile.src = getS3ImageUrl(c.profileImage);
+        } else {
+          profile.src = "/assets/images/default_profile.png";
+        }
+        profile.alt = "프로필 이미지";
 
         const name = document.createElement("span");
         name.className = "comment-author";
