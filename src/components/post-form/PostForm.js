@@ -2,6 +2,7 @@ import InputField from "/src/components/input-field/InputField.js";
 import Button from "/src/components/button/Button.js";
 import { showToast } from "/src/utils/showToast.js";
 import { uploadPostImage } from "/src/api/uploadApi.js";
+import { getS3ImageUrl } from "/src/config/appConfig.js";
 
 export default function PostForm({
   mode = "create",
@@ -26,6 +27,7 @@ export default function PostForm({
     required: true,
     validateFn: (v) => v.length <= 26,
     invalidMessage: "제목은 26자 이내로 입력해주세요.",
+    width: "560px",
   });
   const titleEl = titleField.render();
   container.appendChild(titleEl);
@@ -38,6 +40,7 @@ export default function PostForm({
     placeholder: "내용을 입력해주세요.",
     height: "300px",
     required: true,
+    width: "560px",
   });
   const contentEl = contentField.render();
   container.appendChild(contentEl);
@@ -64,78 +67,161 @@ export default function PostForm({
   helperText.style.color = "#666";
   helperText.style.marginTop = "4px";
 
-  const fileList = document.createElement("ul");
-  fileList.className = "file-list";
-  fileList.style.listStyle = "disc";
-  fileList.style.paddingLeft = "16px";
-  fileList.style.marginTop = "8px";
+  const imagePreviewContainer = document.createElement("div");
+  imagePreviewContainer.className = "image-preview-container";
 
   // 업로드된 이미지 objectKey 저장
   const uploadedImageKeys = [];
 
-  // 파일 선택 시 업로드 및 목록 표시
+  // 이미지 미리보기 아이템 생성 함수
+  const createImagePreviewItem = (imageUrl, objectKey, isExisting = false) => {
+    const previewItem = document.createElement("div");
+    previewItem.className = "image-preview-item";
+    previewItem.dataset.objectKey = objectKey;
+
+    const img = document.createElement("img");
+    img.src = imageUrl;
+    img.alt = "이미지 미리보기";
+    img.className = "preview-image";
+
+    const overlay = document.createElement("div");
+    overlay.className = "preview-overlay";
+
+    const statusText = document.createElement("span");
+    statusText.className = "preview-status";
+    if (isExisting) {
+      statusText.textContent = "기존 이미지";
+      statusText.style.background = "#3498db";
+    } else {
+      statusText.textContent = "업로드 완료";
+      statusText.style.background = "#27ae60";
+    }
+
+    overlay.appendChild(statusText);
+    previewItem.appendChild(img);
+    previewItem.appendChild(overlay);
+
+    return previewItem;
+  };
+
+  // 로딩 중 미리보기 아이템 생성 함수
+  const createLoadingPreviewItem = (file) => {
+    const previewItem = document.createElement("div");
+    previewItem.className = "image-preview-item loading";
+
+    // FileReader로 로컬 파일 미리보기
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = previewItem.querySelector("img");
+      if (img) {
+        img.src = e.target.result;
+      }
+    };
+    reader.readAsDataURL(file);
+
+    const img = document.createElement("img");
+    img.alt = "업로드 중...";
+    img.className = "preview-image";
+
+    const overlay = document.createElement("div");
+    overlay.className = "preview-overlay";
+
+    const statusText = document.createElement("span");
+    statusText.className = "preview-status";
+    statusText.textContent = "업로드 중...";
+    statusText.style.background = "#f39c12";
+
+    overlay.appendChild(statusText);
+    previewItem.appendChild(img);
+    previewItem.appendChild(overlay);
+
+    return previewItem;
+  };
+
+  // 에러 미리보기 아이템 생성 함수
+  const createErrorPreviewItem = (fileName) => {
+    const previewItem = document.createElement("div");
+    previewItem.className = "image-preview-item error";
+
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "preview-error";
+    errorDiv.innerHTML = `
+      <span class="error-icon">⚠️</span>
+      <span class="error-text">${fileName}</span>
+      <span class="error-message">업로드 실패</span>
+    `;
+
+    previewItem.appendChild(errorDiv);
+    return previewItem;
+  };
+
+  // 파일 선택 시 업로드 및 미리보기 표시
   fileInput.addEventListener("change", async () => {
-    // 기존 이미지 목록은 유지하고, 새로 업로드한 이미지만 추가
-    const existingListItems = Array.from(fileList.querySelectorAll("li")).filter(
-      (li) => li.textContent.includes("(기존 이미지)")
+    // 기존 이미지 미리보기 유지
+    const existingPreviews = Array.from(
+      imagePreviewContainer.querySelectorAll(".image-preview-item[data-is-existing='true']")
     );
-    
-    // 새로 선택한 파일들만 업로드 (기존 업로드된 키는 유지)
+
+    // 새로 선택한 파일들만 업로드
     const files = Array.from(fileInput.files);
     if (files.length === 0) {
-      // 파일이 없으면 기존 목록만 표시
-      fileList.innerHTML = "";
-      existingListItems.forEach((li) => fileList.appendChild(li));
+      // 파일이 없으면 기존 미리보기만 표시
+      imagePreviewContainer.innerHTML = "";
+      existingPreviews.forEach((preview) => {
+        imagePreviewContainer.appendChild(preview);
+      });
       return;
     }
 
-    // 기존 목록 초기화 후 기존 이미지 목록 다시 추가
-    fileList.innerHTML = "";
-    existingListItems.forEach((li) => fileList.appendChild(li));
+    // 기존 미리보기 초기화 후 기존 이미지 다시 추가
+    imagePreviewContainer.innerHTML = "";
+    existingPreviews.forEach((preview) => {
+      imagePreviewContainer.appendChild(preview);
+    });
 
     // 각 파일에 대해 업로드 진행
     for (const file of files) {
-      const li = document.createElement("li");
-      li.style.fontSize = "13px";
-      li.textContent = `${file.name} (업로드 중...)`;
-      li.style.color = "#666";
-      fileList.appendChild(li);
+      const loadingItem = createLoadingPreviewItem(file);
+      imagePreviewContainer.appendChild(loadingItem);
 
       try {
         const { ok, data } = await uploadPostImage(file);
         if (ok && data.status === 201 && data.data && data.data.length > 0) {
           const objectKey = data.data[0].objectKey;
           uploadedImageKeys.push(objectKey);
-          li.textContent = `${file.name} ✓`;
-          li.style.color = "#333";
+          const imageUrl = getS3ImageUrl(objectKey);
+          
+          // 로딩 아이템을 완료 아이템으로 교체
+          const completedItem = createImagePreviewItem(imageUrl, objectKey, false);
+          loadingItem.replaceWith(completedItem);
         } else {
-          li.textContent = `${file.name} (업로드 실패)`;
-          li.style.color = "#e74c3c";
+          // 로딩 아이템을 에러 아이템으로 교체
+          const errorItem = createErrorPreviewItem(file.name);
+          loadingItem.replaceWith(errorItem);
           showToast(`${file.name} 업로드에 실패했습니다.`);
         }
       } catch (err) {
         console.error("[PostForm] 이미지 업로드 실패:", err);
-        li.textContent = `${file.name} (업로드 실패)`;
-        li.style.color = "#e74c3c";
+        const errorItem = createErrorPreviewItem(file.name);
+        loadingItem.replaceWith(errorItem);
         showToast(`${file.name} 업로드에 실패했습니다.`);
       }
     }
   });
 
-  // 수정 모드일 때 기존 이미지 목록 표시
+  // 수정 모드일 때 기존 이미지 미리보기 표시
   const existingImageKeys = [];
   if (mode === "edit" && initialData.imageKeyList?.length > 0) {
     initialData.imageKeyList.forEach((imgKey) => {
       existingImageKeys.push(imgKey);
-      const li = document.createElement("li");
-      li.textContent = `${imgKey} (기존 이미지)`;
-      li.style.fontSize = "13px";
-      li.style.color = "#666";
-      fileList.appendChild(li);
+      const imageUrl = getS3ImageUrl(imgKey);
+      const previewItem = createImagePreviewItem(imageUrl, imgKey, true);
+      previewItem.dataset.isExisting = "true";
+      imagePreviewContainer.appendChild(previewItem);
     });
   }
 
-  imageWrapper.append(fileInput, helperText, fileList);
+  imageWrapper.append(fileInput, helperText, imagePreviewContainer);
   container.appendChild(imageWrapper);
 
   // ===== 초기값 세팅 (수정 모드) =====
@@ -148,7 +234,7 @@ export default function PostForm({
   const submitButton = new Button({
     text: mode === "edit" ? "수정하기" : "작성하기",
     className: "primary",
-    width: "320px",
+    width: "560px",
     onClick: async (e) => {
       e.preventDefault();
 
