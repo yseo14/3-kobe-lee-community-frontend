@@ -13,3 +13,12 @@ export const getS3ImageUrl = (imageKey) => {
   return `https://${S3_BUCKET_NAME}.s3.${S3_REGION}.amazonaws.com/${imageKey}`;
 };
 
+// 업로드 API 설정
+export const UPLOAD_API_BASE_URL = "https://2ugqz2n65e.execute-api.ap-northeast-2.amazonaws.com";
+export const UPLOAD_API_PATH = "/upload/images";
+
+// 업로드 API URL 생성 함수
+export const getUploadApiUrl = (type) => {
+  return `${UPLOAD_API_BASE_URL}${UPLOAD_API_PATH}?type=${type}`;
+};
+

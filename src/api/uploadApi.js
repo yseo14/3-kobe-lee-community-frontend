@@ -1,10 +1,12 @@
+import { getUploadApiUrl } from "../config/appConfig.js";
+
 /**
  * 프로필 이미지 업로드 API
  * @param {File} file - 업로드할 이미지 파일
  * @returns {Promise<{ok: boolean, data: {status: number, message: string, data: Array<{objectKey: string}>}}>}
  */
 export async function uploadProfileImage(file) {
-  const UPLOAD_URL = "https://2ugqz2n65e.execute-api.ap-northeast-2.amazonaws.com/upload/images?type=profile";
+  const UPLOAD_URL = getUploadApiUrl("profile");
 
   try {
     const formData = new FormData();
@@ -33,7 +35,7 @@ export async function uploadProfileImage(file) {
  * @returns {Promise<{ok: boolean, data: {status: number, message: string, data: Array<{objectKey: string}>}}>}
  */
 export async function uploadPostImage(file) {
-  const UPLOAD_URL = "https://2ugqz2n65e.execute-api.ap-northeast-2.amazonaws.com/upload/images?type=post";
+  const UPLOAD_URL = getUploadApiUrl("post");
 
   try {
     const formData = new FormData();
