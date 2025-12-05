@@ -62,7 +62,7 @@ export default function PostForm({
 
   const helperText = document.createElement("p");
   helperText.className = "helper-text";
-  helperText.textContent = "여러 이미지를 선택할 수 있습니다.";
+  helperText.textContent = "여러 이미지를 선택할 수 있습니다. 드래그하여 순서를 변경하거나 × 버튼으로 삭제할 수 있습니다.";
   helperText.style.fontSize = "13px";
   helperText.style.color = "#666";
   helperText.style.marginTop = "4px";
@@ -70,26 +70,60 @@ export default function PostForm({
   const imagePreviewContainer = document.createElement("div");
   imagePreviewContainer.className = "image-preview-container";
 
-  // 업로드된 이미지 objectKey 저장
-  const uploadedImageKeys = [];
+  // 이미지 상태 관리: { objectKey, isExisting, imageUrl } 배열
+  const imageList = [];
+
+  // 이미지 목록 업데이트 및 UI 렌더링
+  const renderImagePreviews = () => {
+    // 기존 미리보기 모두 제거
+    const existingItems = imagePreviewContainer.querySelectorAll(".image-preview-item");
+    existingItems.forEach(item => item.remove());
+    
+    // 새로 렌더링
+    imageList.forEach((image, index) => {
+      const previewItem = createImagePreviewItem(
+        image.imageUrl,
+        image.objectKey,
+        image.isExisting,
+        index
+      );
+      imagePreviewContainer.appendChild(previewItem);
+    });
+  };
 
   // 이미지 미리보기 아이템 생성 함수
-  const createImagePreviewItem = (imageUrl, objectKey, isExisting = false) => {
+  const createImagePreviewItem = (
+    imageUrl,
+    objectKey,
+    isExisting = false,
+    index = 0
+  ) => {
     const previewItem = document.createElement("div");
     previewItem.className = "image-preview-item";
     previewItem.dataset.objectKey = objectKey;
+    previewItem.dataset.index = index;
+    previewItem.draggable = true;
+
+    // 썸네일 표시 (첫 번째 이미지만)
+    if (index === 0) {
+      previewItem.classList.add("thumbnail");
+    }
 
     const img = document.createElement("img");
     img.src = imageUrl;
     img.alt = "이미지 미리보기";
     img.className = "preview-image";
+    img.draggable = false; // 이미지 자체는 드래그 불가
 
     const overlay = document.createElement("div");
     overlay.className = "preview-overlay";
 
     const statusText = document.createElement("span");
     statusText.className = "preview-status";
-    if (isExisting) {
+    if (index === 0) {
+      statusText.textContent = "썸네일";
+      statusText.style.background = "#a78bfa";
+    } else if (isExisting) {
       statusText.textContent = "기존 이미지";
       statusText.style.background = "#3498db";
     } else {
@@ -97,11 +131,138 @@ export default function PostForm({
       statusText.style.background = "#27ae60";
     }
 
+    // 삭제 버튼
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "preview-delete-btn";
+    deleteBtn.innerHTML = "×";
+    deleteBtn.title = "이미지 삭제";
+    deleteBtn.onclick = (e) => {
+      e.stopPropagation();
+      removeImage(index);
+    };
+
+    // 드래그 여부 추적
+    let isDragging = false;
+    let mouseDownX = 0;
+    let mouseDownY = 0;
+
+    // 썸네일로 설정하는 함수
+    const setAsThumbnail = (e) => {
+      // 드래그 중이거나 삭제 버튼 클릭인 경우 무시
+      if (isDragging || e.target === deleteBtn || deleteBtn.contains(e.target)) {
+        return;
+      }
+      
+      // 마우스 이동 거리가 5px 이상이면 드래그로 간주
+      const deltaX = Math.abs(e.clientX - mouseDownX);
+      const deltaY = Math.abs(e.clientY - mouseDownY);
+      if (deltaX > 5 || deltaY > 5) {
+        return;
+      }
+      
+      if (index !== 0) {
+        // 해당 이미지를 첫 번째 위치로 이동
+        const [movedItem] = imageList.splice(index, 1);
+        imageList.unshift(movedItem);
+        renderImagePreviews();
+        showToast("썸네일로 설정되었습니다.");
+      }
+    };
+
+    // 마우스 다운 위치 저장
+    previewItem.addEventListener("mousedown", (e) => {
+      mouseDownX = e.clientX;
+      mouseDownY = e.clientY;
+      isDragging = false;
+    });
+
+    // 이미지 클릭 시 썸네일로 설정
+    previewItem.addEventListener("click", setAsThumbnail);
+    previewItem.style.cursor = "pointer";
+    previewItem.title = "클릭하여 썸네일로 설정";
+
     overlay.appendChild(statusText);
     previewItem.appendChild(img);
     previewItem.appendChild(overlay);
+    previewItem.appendChild(deleteBtn);
+
+    // 드래그 앤 드롭 이벤트
+    previewItem.addEventListener("dragstart", (e) => {
+      isDragging = true;
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/html", index.toString());
+      previewItem.classList.add("dragging");
+    });
+
+    previewItem.addEventListener("dragend", () => {
+      isDragging = false;
+      previewItem.classList.remove("dragging");
+    });
+
+    previewItem.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      const draggingItem = imagePreviewContainer.querySelector(".dragging");
+      if (draggingItem && draggingItem !== previewItem) {
+        const allItems = Array.from(
+          imagePreviewContainer.querySelectorAll(".image-preview-item:not(.loading):not(.error)")
+        );
+        const draggingIndex = allItems.indexOf(draggingItem);
+        const currentIndex = allItems.indexOf(previewItem);
+
+        // 시각적 피드백을 위해 DOM 조작 (실제 데이터는 drop에서 변경)
+        if (draggingIndex < currentIndex) {
+          previewItem.parentNode.insertBefore(draggingItem, previewItem.nextSibling);
+        } else {
+          previewItem.parentNode.insertBefore(draggingItem, previewItem);
+        }
+      }
+    });
+
+    previewItem.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const fromIndex = parseInt(e.dataTransfer.getData("text/html"));
+      
+      // dragover로 인해 변경된 DOM 위치를 기반으로 실제 위치 찾기
+      const allItems = Array.from(
+        imagePreviewContainer.querySelectorAll(".image-preview-item:not(.loading):not(.error)")
+      );
+      
+      // draggingItem의 현재 DOM 위치를 찾음
+      const draggingItem = imagePreviewContainer.querySelector(".dragging");
+      let toIndex;
+      
+      if (draggingItem) {
+        // draggingItem이 있으면 그 위치를 사용
+        toIndex = allItems.indexOf(draggingItem);
+      } else {
+        // dragging 클래스가 제거된 경우 (dragend가 먼저 발생한 경우)
+        // dragover에서 draggingItem이 previewItem 앞이나 뒤로 이동했으므로
+        // previewItem의 위치를 기준으로 계산
+        const previewIndex = allItems.indexOf(previewItem);
+        // dragover에서 draggingItem이 previewItem 앞으로 이동했다면 previewItem의 인덱스가 toIndex
+        // dragover에서 draggingItem이 previewItem 뒤로 이동했다면 previewItem의 인덱스가 toIndex
+        toIndex = previewIndex;
+      }
+
+      // 순서가 실제로 변경되었는지 확인하고 데이터 업데이트
+      if (fromIndex !== toIndex && fromIndex >= 0 && toIndex >= 0 && fromIndex < imageList.length && toIndex < imageList.length) {
+        // 배열에서 순서 변경
+        const [movedItem] = imageList.splice(fromIndex, 1);
+        imageList.splice(toIndex, 0, movedItem);
+        // 썸네일 갱신을 위해 전체 다시 렌더링
+        renderImagePreviews();
+      }
+    });
 
     return previewItem;
+  };
+
+  // 이미지 제거 함수
+  const removeImage = (index) => {
+    imageList.splice(index, 1);
+    renderImagePreviews();
   };
 
   // 로딩 중 미리보기 아이템 생성 함수
@@ -157,27 +318,10 @@ export default function PostForm({
 
   // 파일 선택 시 업로드 및 미리보기 표시
   fileInput.addEventListener("change", async () => {
-    // 기존 이미지 미리보기 유지
-    const existingPreviews = Array.from(
-      imagePreviewContainer.querySelectorAll(".image-preview-item[data-is-existing='true']")
-    );
-
-    // 새로 선택한 파일들만 업로드
     const files = Array.from(fileInput.files);
     if (files.length === 0) {
-      // 파일이 없으면 기존 미리보기만 표시
-      imagePreviewContainer.innerHTML = "";
-      existingPreviews.forEach((preview) => {
-        imagePreviewContainer.appendChild(preview);
-      });
       return;
     }
-
-    // 기존 미리보기 초기화 후 기존 이미지 다시 추가
-    imagePreviewContainer.innerHTML = "";
-    existingPreviews.forEach((preview) => {
-      imagePreviewContainer.appendChild(preview);
-    });
 
     // 각 파일에 대해 업로드 진행
     for (const file of files) {
@@ -188,12 +332,18 @@ export default function PostForm({
         const { ok, data } = await uploadPostImage(file);
         if (ok && data.status === 201 && data.data && data.data.length > 0) {
           const objectKey = data.data[0].objectKey;
-          uploadedImageKeys.push(objectKey);
           const imageUrl = getS3ImageUrl(objectKey);
-          
-          // 로딩 아이템을 완료 아이템으로 교체
-          const completedItem = createImagePreviewItem(imageUrl, objectKey, false);
-          loadingItem.replaceWith(completedItem);
+
+          // 이미지 목록에 추가
+          imageList.push({
+            objectKey,
+            isExisting: false,
+            imageUrl,
+          });
+
+          // 로딩 아이템 제거하고 다시 렌더링
+          loadingItem.remove();
+          renderImagePreviews();
         } else {
           // 로딩 아이템을 에러 아이템으로 교체
           const errorItem = createErrorPreviewItem(file.name);
@@ -207,18 +357,22 @@ export default function PostForm({
         showToast(`${file.name} 업로드에 실패했습니다.`);
       }
     }
+
+    // 파일 입력 초기화
+    fileInput.value = "";
   });
 
   // 수정 모드일 때 기존 이미지 미리보기 표시
-  const existingImageKeys = [];
   if (mode === "edit" && initialData.imageKeyList?.length > 0) {
     initialData.imageKeyList.forEach((imgKey) => {
-      existingImageKeys.push(imgKey);
       const imageUrl = getS3ImageUrl(imgKey);
-      const previewItem = createImagePreviewItem(imageUrl, imgKey, true);
-      previewItem.dataset.isExisting = "true";
-      imagePreviewContainer.appendChild(previewItem);
+      imageList.push({
+        objectKey: imgKey,
+        isExisting: true,
+        imageUrl,
+      });
     });
+    renderImagePreviews();
   }
 
   imageWrapper.append(fileInput, helperText, imagePreviewContainer);
@@ -246,21 +400,18 @@ export default function PostForm({
         return showToast("제목은 최대 26자까지 입력 가능합니다.");
       if (!content) return showToast("내용을 입력해주세요.");
 
-      // 업로드된 이미지 objectKey 사용
-      // 수정 모드일 때 기존 이미지와 새로 업로드한 이미지 합치기
-      let finalImageKeyList = [...uploadedImageKeys];
-      
-      if (mode === "edit" && initialData.imageKeyList?.length > 0) {
-        // 기존 이미지 키들도 포함 (새로 업로드한 이미지 뒤에 추가)
-        finalImageKeyList = [...uploadedImageKeys, ...initialData.imageKeyList];
-      }
+      // 이미지 목록에서 objectKey 추출
+      // 기존 이미지는 그대로 유지, 새 이미지는 temp/ 경로로 전송
+      const objectKeys = imageList.map((img) => img.objectKey);
+      const thumbnailObjectKey =
+        imageList.length > 0 ? imageList[0].objectKey : null;
 
       // onSubmit 콜백으로 부모에서 API 요청 처리
       await onSubmit({
         title,
         content,
-        objectKeys: finalImageKeyList,
-        thumbnailObjectKey: finalImageKeyList.length > 0 ? finalImageKeyList[0] : null,
+        objectKeys,
+        thumbnailObjectKey,
       });
     },
   });
