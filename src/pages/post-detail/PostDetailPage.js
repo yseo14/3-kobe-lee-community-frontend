@@ -284,12 +284,156 @@ export default function PostDetailPage(postIdFromRoute) {
     mainSection.append(...elementsToAppend);
   };
 
-  // 댓글 렌더링
-  const renderComments = (comments = []) => {
-    commentSection.innerHTML = "";
+  // 댓글 목록 저장
+  let allComments = [];
+  let commentList = null;
+  let commentInputBox = null;
 
-    // 항상 댓글 입력창은 표시
-    const commentInputBox = document.createElement("div");
+  // 댓글 아이템 렌더링 (공통 함수)
+  const renderCommentItem = (c) => {
+    const item = document.createElement("div");
+    item.className = "comment-item";
+
+    const top = document.createElement("div");
+    top.className = "comment-top";
+
+    const topLeft = document.createElement("div");
+    topLeft.className = "comment-top-left";
+
+    const profile = document.createElement("img");
+    profile.className = "profile-image";
+    if (c.profileImage) {
+      profile.src = getS3ImageUrl(c.profileImage);
+    } else {
+      profile.src = "/assets/images/default_profile.png";
+    }
+    profile.alt = "프로필 이미지";
+
+    const name = document.createElement("span");
+    name.className = "comment-author";
+    name.textContent = c.nickname;
+
+    const date = document.createElement("span");
+    date.className = "comment-date";
+    date.textContent = formatDate(c.createdAt);
+
+    topLeft.append(profile, name, date);
+
+    const actions = document.createElement("div");
+    actions.className = "comment-actions";
+
+    const content = document.createElement("p");
+    content.className = "comment-content";
+    content.textContent = c.content;
+
+    let isEditing = false;
+    let inputEl;
+
+    if (c.viewerCanEdit) {
+      const editBtn = new Button({
+        text: "수정",
+        className: "secondary-outline",
+        onClick: () => {
+          if (isEditing) return;
+          isEditing = true;
+          content.innerHTML = "";
+          inputEl = document.createElement("textarea");
+          inputEl.className = "comment-edit-input";
+          inputEl.value = c.content;
+          content.appendChild(inputEl);
+          actions.innerHTML = "";
+
+          const confirmBtn = new Button({
+            text: "확인",
+            className: "primary",
+            height: "28px",
+            onClick: async () => {
+              const newContent = inputEl.value.trim();
+              if (!newContent) {
+                showToast("내용을 입력해주세요.");
+                return;
+              }
+              try {
+                const { ok, data } = await updateComment(postId, c.commentId, newContent);
+                if (ok && data.isSuccess) {
+                  showToast("댓글이 수정되었습니다!");
+                  c.content = newContent;
+                  isEditing = false;
+                  renderComments(true);
+                } else {
+                  showToast(data?.message || "댓글 수정에 실패했습니다.");
+                }
+              } catch (err) {
+                console.error("댓글 수정 실패:", err);
+                showToast("서버 오류로 댓글 수정에 실패했습니다.");
+              }
+            },
+          }).render();
+
+          const cancelBtn = new Button({
+            text: "취소",
+            className: "secondary-outline",
+            height: "28px",
+            onClick: () => {
+              isEditing = false;
+              renderComments(true);
+            },
+          }).render();
+
+          actions.append(confirmBtn, cancelBtn);
+        },
+      }).render();
+      actions.appendChild(editBtn);
+    }
+
+    if (c.viewerCanDelete) {
+      const deleteBtn = new Button({
+        text: "삭제",
+        className: "secondary-outline",
+        onClick: () => {
+          const modal = new Modal({
+            title: "댓글을 삭제하시겠습니까?",
+            message: "삭제한 내용은 복구할 수 없습니다.",
+            cancelText: "취소",
+            confirmText: "확인",
+            onConfirm: async () => {
+              try {
+                const { ok, data } = await deleteComment(postId, c.commentId);
+                if (ok && data.isSuccess) {
+                  showToast("댓글이 삭제되었습니다.");
+                  const { ok: commentOk, data: commentData } = await fetchComments(postId, {
+                    sort: "createdAt",
+                    limit: 10,
+                  });
+                  if (commentOk && commentData.isSuccess) {
+                    allComments = commentData.result.commentList || [];
+                    renderComments(true);
+                  }
+                } else {
+                  showToast(data?.message || "댓글 삭제에 실패했습니다.");
+                }
+              } catch (err) {
+                console.error("댓글 삭제 실패:", err);
+                showToast("서버 오류로 댓글 삭제에 실패했습니다.");
+              }
+            },
+          });
+          modal.open();
+        },
+      }).render();
+      actions.appendChild(deleteBtn);
+    }
+
+    top.append(topLeft, actions);
+    item.append(top, content);
+    return item;
+  };
+
+  // 댓글 입력창 렌더링 (한 번만)
+  const renderCommentInput = () => {
+    if (commentInputBox) return commentInputBox;
+
+    commentInputBox = document.createElement("div");
     commentInputBox.className = "comment-input-box";
 
     const textarea = document.createElement("textarea");
@@ -324,7 +468,8 @@ export default function PostDetailPage(postIdFromRoute) {
             );
 
             if (commentOk && commentData.isSuccess) {
-              renderComments(commentData.result.commentList);
+              allComments = commentData.result.commentList || [];
+              renderComments(true); // 전체 재렌더링
             }
           } else {
             showToast(data?.message || "댓글 등록에 실패했습니다.");
@@ -336,175 +481,38 @@ export default function PostDetailPage(postIdFromRoute) {
       },
     }).render();
     commentInputBox.append(textarea, submitBtn);
+    return commentInputBox;
+  };
 
-    const commentList = document.createElement("div");
-    commentList.className = "comment-list";
+  // 댓글 렌더링 (isFullRender: true면 전체 재렌더링, false면 추가만)
+  const renderComments = (isFullRender = false) => {
+    // 전체 재렌더링인 경우
+    if (isFullRender) {
+      commentSection.innerHTML = "";
+      commentList = document.createElement("div");
+      commentList.className = "comment-list";
+      commentSection.append(renderCommentInput(), commentList);
+    }
 
-    if (comments.length > 0) {
-      comments.forEach((c) => {
-        const item = document.createElement("div");
-        item.className = "comment-item";
+    // commentList가 없으면 생성
+    if (!commentList) {
+      commentList = document.createElement("div");
+      commentList.className = "comment-list";
+      if (!commentInputBox) {
+        commentSection.append(renderCommentInput());
+      }
+      commentSection.append(commentList);
+    }
 
-        const top = document.createElement("div");
-        top.className = "comment-top";
+    // 렌더링할 댓글 목록 결정
+    const commentsToRender = isFullRender ? allComments : [];
 
-        const topLeft = document.createElement("div");
-        topLeft.className = "comment-top-left";
-
-        const profile = document.createElement("img");
-        profile.className = "profile-image";
-        if (c.profileImage) {
-          profile.src = getS3ImageUrl(c.profileImage);
-        } else {
-          profile.src = "/assets/images/default_profile.png";
-        }
-        profile.alt = "프로필 이미지";
-
-        const name = document.createElement("span");
-        name.className = "comment-author";
-        name.textContent = c.nickname;
-
-        const date = document.createElement("span");
-        date.className = "comment-date";
-        date.textContent = formatDate(c.createdAt);
-
-        topLeft.append(profile, name, date);
-
-        // 수정/삭제 버튼
-        const actions = document.createElement("div");
-        actions.className = "comment-actions";
-
-        const content = document.createElement("p");
-        content.className = "comment-content";
-        content.textContent = c.content;
-
-        let isEditing = false; // 수정 모드 상태 관리
-        let inputEl; // 수정 input 참조용
-
-        // 수정 클릭
-        if (c.viewerCanEdit) {
-          const editBtn = new Button({
-            text: "수정",
-            className: "secondary-outline",
-            onClick: () => {
-              if (isEditing) return;
-
-              // 수정 모드 진입
-              isEditing = true;
-              content.innerHTML = "";
-
-              inputEl = document.createElement("textarea");
-              inputEl.className = "comment-edit-input";
-              inputEl.value = c.content;
-
-              content.appendChild(inputEl);
-
-              actions.innerHTML = ""; // 버튼 영역 리셋
-
-              // 확인 버튼
-              const confirmBtn = new Button({
-                text: "확인",
-                className: "primary",
-                height: "28px",
-                onClick: async () => {
-                  const newContent = inputEl.value.trim();
-                  if (!newContent) {
-                    showToast("내용을 입력해주세요.");
-                    return;
-                  }
-
-                  try {
-                    const { ok, data } = await updateComment(
-                      postId,
-                      c.commentId,
-                      newContent
-                    );
-
-                    if (ok && data.isSuccess) {
-                      showToast("댓글이 수정되었습니다!");
-
-                      // 수정 반영
-                      c.content = newContent;
-                      isEditing = false;
-                      renderComments(comments);
-                    } else {
-                      showToast(data?.message || "댓글 수정에 실패했습니다.");
-                    }
-                  } catch (err) {
-                    console.error("댓글 수정 실패:", err);
-                    showToast("서버 오류로 댓글 수정에 실패했습니다.");
-                  }
-                },
-              }).render();
-
-              // 취소 버튼
-              const cancelBtn = new Button({
-                text: "취소",
-                className: "secondary-outline",
-                height: "28px",
-                onClick: () => {
-                  isEditing = false;
-                  renderComments(comments); // 원래 상태로 복원
-                },
-              }).render();
-
-              actions.append(confirmBtn, cancelBtn);
-            },
-          }).render();
-          actions.appendChild(editBtn);
-        }
-        if (c.viewerCanDelete) {
-          const deleteBtn = new Button({
-            text: "삭제",
-            className: "secondary-outline",
-            onClick: () => {
-              const modal = new Modal({
-                title: "댓글을 삭제하시겠습니까?",
-                message: "삭제한 내용은 복구할 수 없습니다.",
-                cancelText: "취소",
-                confirmText: "확인",
-                onConfirm: async () => {
-                  try {
-                    const { ok, data } = await deleteComment(
-                      postId,
-                      c.commentId
-                    );
-                    if (ok && data.isSuccess) {
-                      showToast("댓글이 삭제되었습니다.");
-
-                      // 목록 다시 불러오기
-                      const { ok: commentOk, data: commentData } =
-                        await fetchComments(postId, {
-                          sort: "createdAt",
-                          limit: 10,
-                        });
-
-                      if (commentOk && commentData.isSuccess) {
-                        renderComments(commentData.result.commentList);
-                      }
-                    } else {
-                      showToast(data?.message || "댓글 삭제에 실패했습니다.");
-                    }
-                  } catch (err) {
-                    console.error("댓글 삭제 실패:", err);
-                    showToast("서버 오류로 댓글 삭제에 실패했습니다.");
-                  }
-                },
-              });
-              modal.open();
-            },
-          }).render();
-          actions.appendChild(deleteBtn);
-        }
-
-        top.append(topLeft, actions);
-
-        item.append(top, content);
+    if (commentsToRender.length > 0) {
+      commentsToRender.forEach((c) => {
+        const item = renderCommentItem(c);
         commentList.appendChild(item);
       });
     }
-
-    commentSection.append(commentInputBox, commentList);
   };
 
   // 게시글 상세 조회
@@ -543,12 +551,17 @@ export default function PostDetailPage(postIdFromRoute) {
     isLoading = true;
 
     try {
+      console.log(`[댓글 조회] postId: ${postId}, cursorId: ${cursorId}, cursorCreatedAt: ${cursorCreatedAt}, sort: ${sortType}, limit: ${PAGE_SIZE}`);
+      
       const { ok, data } = await fetchComments(postId, {
         sort: sortType,
         limit: PAGE_SIZE,
         cursorId,
         cursorCreatedAt,
       });
+
+      console.log(`[댓글 조회 응답] ok: ${ok}, isSuccess: ${data?.isSuccess}, 댓글 개수: ${data?.result?.commentList?.length || 0}`);
+      console.log(`[댓글 조회 응답 데이터] result:`, data?.result);
 
       if (!ok || !data.isSuccess) {
         console.error("댓글 목록 불러오기 실패:", data?.message);
@@ -557,10 +570,24 @@ export default function PostDetailPage(postIdFromRoute) {
       }
 
       const comments = data.result.commentList || [];
-      renderComments(comments);
+      
+      // 첫 로드인 경우 전체 재렌더링, 그 외에는 추가
+      const isFirstLoad = allComments.length === 0;
+      if (isFirstLoad) {
+        allComments = comments;
+        renderComments(true); // 전체 재렌더링
+      } else {
+        // 기존 댓글에 새 댓글 추가
+        allComments = [...allComments, ...comments];
+        // 새로 추가된 댓글만 렌더링
+        comments.forEach((c) => {
+          const item = renderCommentItem(c);
+          commentList.appendChild(item);
+        });
+      }
 
       if (comments.length === 0) {
-        console.log("댓글이 없습니다. 입력창만 표시됩니다.");
+        console.log("[댓글 조회] 더 이상 댓글이 없습니다.");
         isLastPage = true;
         observer.disconnect();
         return;
@@ -568,8 +595,15 @@ export default function PostDetailPage(postIdFromRoute) {
 
       cursorId = data.result.nextCursorId;
       cursorCreatedAt = data.result.nextCursorCreatedAt;
+      console.log(`[댓글 조회] ${comments.length}개 댓글 로드 완료. 다음 커서 - cursorId: ${cursorId}, cursorCreatedAt: ${cursorCreatedAt}`);
+      
+      // 다음 페이지가 없는 경우 확인
+      if (!cursorId && !cursorCreatedAt) {
+        console.log("[댓글 조회] 다음 커서가 없습니다. 마지막 페이지입니다.");
+        isLastPage = true;
+      }
     } catch (err) {
-      console.error("서버 통신 에러:", err);
+      console.error("[댓글 조회] 서버 통신 에러:", err);
     } finally {
       isLoading = false;
     }
