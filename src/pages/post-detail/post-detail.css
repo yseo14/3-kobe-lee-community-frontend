@@ -148,12 +148,15 @@
 }
 
 .post-image-item {
+    width: 100%;
     min-width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-shrink: 0;
+    background-color: #000;
+    overflow: hidden;
 }
 
 .post-image-item img {
@@ -161,7 +164,6 @@
     height: 100%;
     object-fit: contain;
     display: block;
-    min-width: 100%;
 }
 
 /* 네비게이션 버튼 */
