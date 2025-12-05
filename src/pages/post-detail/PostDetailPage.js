@@ -1,5 +1,5 @@
 import Button from "/src/components/button/Button.js";
-import { fetchPostDetail, incrementPostView } from "/src/api/postApi.js";
+import { fetchPostDetail, incrementPostView, togglePostLike, cancelPostLike } from "/src/api/postApi.js";
 import { fetchComments } from "/src/api/commentApi.js";
 import { navigate } from "/src/main.js";
 import { deletePost } from "/src/api/postApi.js";
@@ -222,11 +222,55 @@ export default function PostDetailPage(postIdFromRoute) {
     content.className = "post-content";
     content.textContent = post.content;
 
+    // 좋아요 버튼
+    const likeButton = document.createElement("button");
+    likeButton.className = `like-button ${post.isLiked ? "liked" : ""}`;
+    likeButton.innerHTML = `
+      <span class="like-icon">${post.isLiked ? "❤️" : "🤍"}</span>
+      <span class="like-text">좋아요</span>
+    `;
+    
+    let isLiked = post.isLiked || false;
+    let likeCount = post.likeCount || 0;
+    
+    likeButton.addEventListener("click", async () => {
+      try {
+        // 좋아요 상태에 따라 POST 또는 DELETE 호출
+        const { ok, data } = isLiked 
+          ? await cancelPostLike(postId)
+          : await togglePostLike(postId);
+          
+        if (ok && data.isSuccess) {
+          // 좋아요 상태 토글
+          isLiked = !isLiked;
+          likeCount = isLiked ? likeCount + 1 : likeCount - 1;
+          
+          // 버튼 UI 업데이트
+          likeButton.className = `like-button ${isLiked ? "liked" : ""}`;
+          likeButton.innerHTML = `
+            <span class="like-icon">${isLiked ? "❤️" : "🤍"}</span>
+            <span class="like-text">좋아요</span>
+          `;
+          
+          // 통계 업데이트
+          const likeCountElement = stats.querySelector(".like-count");
+          if (likeCountElement) {
+            likeCountElement.textContent = likeCount;
+          }
+        } else {
+          showToast(data?.message || "좋아요 처리에 실패했습니다.");
+        }
+      } catch (err) {
+        console.error("좋아요 처리 실패:", err);
+        showToast("서버 오류로 좋아요 처리에 실패했습니다.");
+      }
+    });
+
     // 좋아요/조회수/댓글
     const stats = document.createElement("div");
     stats.className = "post-stats";
     stats.innerHTML = `
-      <div><strong>${post.likeCount}</strong> 좋아요</div>
+      <div><strong class="like-count">${likeCount}</strong> 좋아요</div>
       <div><strong>${post.viewCount}</strong> 조회수</div>
       <div><strong>${post.commentCount}</strong> 댓글</div>
     `;
@@ -236,7 +280,7 @@ export default function PostDetailPage(postIdFromRoute) {
     if (post.imageKeyList && post.imageKeyList.length > 0) {
       elementsToAppend.push(imageWrapper);
     }
-    elementsToAppend.push(content, stats);
+    elementsToAppend.push(content, likeButton, stats);
     mainSection.append(...elementsToAppend);
   };
 

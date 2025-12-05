@@ -248,6 +248,49 @@
     white-space: pre-line;
 }
 
+/* 좋아요 버튼 */
+.like-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.like-button:hover {
+    border-color: #a78bfa;
+    background-color: #f9fafb;
+}
+
+.like-button.liked {
+    border-color: #ef4444;
+    background-color: #fef2f2;
+    color: #ef4444;
+}
+
+.like-button.liked:hover {
+    background-color: #fee2e2;
+}
+
+.like-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.like-text {
+    font-size: 15px;
+}
+
 /* 좋아요/조회수/댓글 */
 .post-stats {
     display: flex;

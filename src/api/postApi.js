@@ -80,3 +80,33 @@ export function incrementPostView(postId) {
     method: "POST",
   });
 }
+
+/**
+ * 게시글 좋아요 API
+ * POST /post/{postId}/like
+ */
+export function togglePostLike(postId) {
+  if (!postId) {
+    console.error("postId가 없습니다.");
+    return { ok: false, data: null };
+  }
+
+  return apiRequest(`/post/${postId}/like`, {
+    method: "POST",
+  });
+}
+
+/**
+ * 게시글 좋아요 취소 API
+ * DELETE /post/{postId}/like
+ */
+export function cancelPostLike(postId) {
+  if (!postId) {
+    console.error("postId가 없습니다.");
+    return { ok: false, data: null };
+  }
+
+  return apiRequest(`/post/${postId}/like`, {
+    method: "DELETE",
+  });
+}
