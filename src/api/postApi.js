@@ -65,3 +65,18 @@ export function deletePost(postId) {
     method: "DELETE"
   });
 }
+
+/**
+ * 게시글 조회수 증가 API
+ * POST /post/{postId}/view
+ */
+export function incrementPostView(postId) {
+  if (!postId) {
+    console.error("postId가 없습니다.");
+    return { ok: false, data: null };
+  }
+
+  return apiRequest(`/post/${postId}/view`, {
+    method: "POST",
+  });
+}

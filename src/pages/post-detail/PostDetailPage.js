@@ -1,5 +1,5 @@
 import Button from "/src/components/button/Button.js";
-import { fetchPostDetail } from "/src/api/postApi.js";
+import { fetchPostDetail, incrementPostView } from "/src/api/postApi.js";
 import { fetchComments } from "/src/api/commentApi.js";
 import { navigate } from "/src/main.js";
 import { deletePost } from "/src/api/postApi.js";
@@ -466,6 +466,14 @@ export default function PostDetailPage(postIdFromRoute) {
   // 게시글 상세 조회
   (async () => {
     try {
+      // 조회수 증가 API를 먼저 호출하고 완료된 후 상세 조회
+      try {
+        await incrementPostView(postId);
+      } catch (err) {
+        console.warn("조회수 증가 실패:", err);
+        // 조회수 증가 실패해도 게시글 조회는 계속 진행
+      }
+
       const { ok, data } = await fetchPostDetail(postId);
       if (ok && data.isSuccess) {
         renderPost(data.result);
