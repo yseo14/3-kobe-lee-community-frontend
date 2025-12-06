@@ -103,7 +103,7 @@ export default function Header({
   changePassword.textContent = "비밀번호 수정";
   changePassword.onclick = () => {
     dropdown.classList.remove("show");
-    navigate("/change-password");
+    navigate("/password-change");
   };
 
   const logout = document.createElement("button");

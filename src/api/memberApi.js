@@ -43,3 +43,11 @@ export function checkNicknameDuplicate(nickname) {
     method: "GET",
   });
 }
+
+// 비밀번호 수정
+export function updatePassword(body) {
+  return apiRequest("/member/password", {
+    method: "PUT",
+    body: JSON.stringify(body),
+  });
+}

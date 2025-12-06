@@ -3,6 +3,7 @@ import LoginPage from "/src/pages/login/LoginPage.js";
 import SignupPage from "/src/pages/signup/SignupPage.js";
 import PostListPage from "/src/pages/post-list/PostListPage.js";
 import EditProfilePage from "/src/pages/edit-profile/EditProfilePage.js";
+import PasswordChangePage from "/src/pages/password-change/PasswordChangePage.js";
 import PostCreatePage from "/src/pages/post/PostCreatePage.js";
 import Footer from "/src/components/footer/Footer.js";
 import PostDetailPage from "/src/pages/post-detail/PostDetailPage.js";
@@ -91,6 +92,10 @@ function handleRouting() {
 
     case "/edit-profile":
       renderPage(EditProfilePage, { showBack: true, showProfile: true });
+      break;
+
+    case "/password-change":
+      renderPage(PasswordChangePage, { showBack: true, showProfile: true });
       break;
 
     case "/login":
