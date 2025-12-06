@@ -19,7 +19,7 @@ layout.className = "layout";
 
 // 초기 헤더 생성
 const header = Header({
-  title: "톡톡 커뮤니티",
+  title: "Locker Room",
   showBack: false,
   showProfile: false,
 });
@@ -40,7 +40,7 @@ root.appendChild(layout);
 function renderPage(pageComponent, headerOptions = {}) {
   // 페이지 전환시 Header의 update()를 호출하여 상태 변경(뒤로가기, 프로필 버튼 여부)
   header.update({
-    title: "톡톡 커뮤니티",
+    title: "Locker Room",
     ...headerOptions,
   });
 

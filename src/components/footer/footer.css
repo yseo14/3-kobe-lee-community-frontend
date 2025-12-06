@@ -4,8 +4,9 @@
   left: 0;
   width: 100%;
   height: 56px;
-  background-color: #f6f6f8;
-  border-top: 1px solid #ddd;
+  background-color: #FFFFFF;
+  border-top: 2px solid #2C2C2C;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.08);
   display: flex;
   justify-content: center;
   align-items: center;

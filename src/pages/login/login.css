@@ -1,6 +1,6 @@
 body {
     font-family: 'Pretendard', sans-serif;
-    background-color: #f6f6f8;
+    background-color: #F5F5F5;
     margin: 0;
     display: flex;
     justify-content: center;
@@ -22,7 +22,7 @@ h1 {
 
 .login-button {
     width: 320px;
-    background-color: #a78bfa;
+    background-color: #A04050;
     border: none;
     color: white;
     padding: 12px;
@@ -35,7 +35,7 @@ h1 {
 }
 
 .login-button:hover {
-    background-color: #8b5cf6;
+    background-color: #8B2D3D;
 }
 
 .signup-button {

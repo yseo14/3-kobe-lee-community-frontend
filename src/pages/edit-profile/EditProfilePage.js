@@ -52,19 +52,34 @@ export default function EditProfilePage(userData) {
       currentImageUrl: currentProfileImageUrl,
     });
     container.appendChild(profileUpload.render());
-    // 이메일 (읽기 전용)
-    const emailField = new InputField({
-      id: "email",
-      label: "이메일",
-      type: "text",
-      placeholder: "이메일을 입력하세요",
-      helperText: "",
+    // 이메일 (읽기 전용 - 텍스트로 표시)
+    const emailSection = document.createElement("div");
+    emailSection.className = "email-display-section";
+    
+    const emailLabel = document.createElement("label");
+    emailLabel.className = "email-label";
+    emailLabel.textContent = "이메일";
+    emailSection.appendChild(emailLabel);
+    
+    const emailValue = document.createElement("div");
+    emailValue.className = "email-value";
+    emailValue.textContent = userData?.email || "startupcode@gmail.com";
+    emailValue.style.cursor = "pointer";
+    emailSection.appendChild(emailValue);
+    
+    const emailHelper = document.createElement("p");
+    emailHelper.className = "email-helper";
+    emailHelper.textContent = "이메일은 변경할 수 없습니다";
+    emailHelper.style.display = "none";
+    emailSection.appendChild(emailHelper);
+    
+    // 이메일 칸 클릭 시 헬퍼 텍스트 토글
+    emailValue.addEventListener("click", () => {
+      const isVisible = emailHelper.style.display !== "none";
+      emailHelper.style.display = isVisible ? "none" : "block";
     });
-    const emailEl = emailField.render();
-    emailEl.querySelector("input").value =
-      userData?.email || "startupcode@gmail.com";
-    emailEl.querySelector("input").readOnly = true;
-    container.appendChild(emailEl);
+    
+    container.appendChild(emailSection);
 
     // 닉네임
     const nicknameField = new InputField({

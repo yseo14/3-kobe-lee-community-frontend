@@ -30,8 +30,8 @@
     right: 8px;
     top: 50%;
     transform: translateY(-50%);
-    background-color: #f3e8ff;
-    color: #6b21a8;
+    background-color: #E8F0F8;
+    color: #2C5F8D;
     border: none;
     border-radius: 6px;
     font-size: 13px;
@@ -47,7 +47,7 @@
 
 .signup-button {
     width: 100%;
-    background-color: #a78bfa;
+    background-color: #A04050;
     color: white;
     font-weight: 600;
     border: none;
@@ -59,7 +59,7 @@
 }
 
 .signup-button:hover {
-    background-color: #8b5cf6;
+    background-color: #8B2D3D;
 }
 
 .go-login {
@@ -71,7 +71,7 @@
 }
 
 .go-login:hover {
-    color: #6b21a8;
+    color: #2C5F8D;
 }
 
 .helper-text {

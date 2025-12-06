@@ -21,8 +21,13 @@
     transition: border-color 0.2s;
 }
 
+textarea.input-field {
+    resize: vertical;
+    min-height: 100px;
+}
+
 .input-field:focus {
-    border-color: #a78bfa;
+    border-color: #2C5F8D;
     outline: none;
 }
 

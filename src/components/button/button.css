@@ -16,7 +16,7 @@
 
 /* 🔹 프라이머리 버튼 */
 .button.primary {
-    background-color: #a78bfa;
+    background-color: #A04050;
     color: white;
     padding: 10px 16px;
     height: 48px;
@@ -25,7 +25,7 @@
 }
 
 .button.primary:hover {
-    background-color: #8b5cf6;
+    background-color: #8B2D3D;
 }
 
 /* 🔹 텍스트 버튼 */
@@ -60,11 +60,11 @@
     display: block;
 }
 
-/* 보라색 테두리 아웃라인 버튼 (수정/삭제용) */
+/* 파란색 테두리 아웃라인 버튼 (수정/삭제용) */
 .button.secondary-outline {
-    border: 1px solid #a78bfa;
+    border: 1px solid #2C5F8D;
     background-color: #fff;
-    color: #6b21a8;
+    color: #2C5F8D;
     font-size: 13px;
     font-weight: 600;
     padding: 6px 12px;
@@ -74,5 +74,7 @@
 }
 
 .button.secondary-outline:hover {
-    background-color: #f3e8ff;
+    background-color: #E8F0F8;
+    border-color: #1D428A;
+    color: #1D428A;
 }

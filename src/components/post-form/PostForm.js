@@ -50,22 +50,36 @@ export default function PostForm({
   imageWrapper.className = "image-upload-wrapper";
 
   const imageLabel = document.createElement("label");
+  imageLabel.className = "image-upload-label";
   imageLabel.textContent = "이미지";
-  imageLabel.style.display = "block";
-  imageLabel.style.marginBottom = "6px";
   imageWrapper.appendChild(imageLabel);
+
+  const buttonWrapper = document.createElement("div");
+  buttonWrapper.className = "image-upload-button-wrapper";
 
   const fileInput = document.createElement("input");
   fileInput.type = "file";
   fileInput.multiple = true;
   fileInput.accept = "image/*";
+  fileInput.id = "image-upload-input";
+
+  const uploadButton = document.createElement("label");
+  uploadButton.className = "image-upload-button";
+  uploadButton.setAttribute("for", "image-upload-input");
+  uploadButton.innerHTML = `
+    <span class="image-upload-icon">📷</span>
+    <span>이미지 선택</span>
+  `;
+
+  buttonWrapper.appendChild(fileInput);
+  buttonWrapper.appendChild(uploadButton);
 
   const helperText = document.createElement("p");
   helperText.className = "helper-text";
   helperText.textContent = "여러 이미지를 선택할 수 있습니다. 드래그하여 순서를 변경하거나 × 버튼으로 삭제할 수 있습니다.";
   helperText.style.fontSize = "13px";
   helperText.style.color = "#666";
-  helperText.style.marginTop = "4px";
+  helperText.style.marginTop = "8px";
 
   const imagePreviewContainer = document.createElement("div");
   imagePreviewContainer.className = "image-preview-container";
@@ -122,7 +136,7 @@ export default function PostForm({
     statusText.className = "preview-status";
     if (index === 0) {
       statusText.textContent = "썸네일";
-      statusText.style.background = "#a78bfa";
+      statusText.style.background = "#A04050";
     } else if (isExisting) {
       statusText.textContent = "기존 이미지";
       statusText.style.background = "#3498db";
@@ -375,7 +389,7 @@ export default function PostForm({
     renderImagePreviews();
   }
 
-  imageWrapper.append(fileInput, helperText, imagePreviewContainer);
+  imageWrapper.append(imageLabel, buttonWrapper, helperText, imagePreviewContainer);
   container.appendChild(imageWrapper);
 
   // ===== 초기값 세팅 (수정 모드) =====

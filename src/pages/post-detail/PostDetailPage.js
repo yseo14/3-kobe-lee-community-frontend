@@ -225,10 +225,24 @@ export default function PostDetailPage(postIdFromRoute) {
     // 좋아요 버튼
     const likeButton = document.createElement("button");
     likeButton.className = `like-button ${post.isLiked ? "liked" : ""}`;
-    likeButton.innerHTML = `
-      <span class="like-icon">${post.isLiked ? "❤️" : "🤍"}</span>
-      <span class="like-text">좋아요</span>
-    `;
+    
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "like-icon";
+    const iconImg = document.createElement("img");
+    iconImg.src = post.isLiked 
+      ? "/assets/images/bball.png" 
+      : "/assets/images/rim.png";
+    iconImg.alt = post.isLiked ? "좋아요 활성화" : "좋아요";
+    iconImg.style.width = "20px";
+    iconImg.style.height = "20px";
+    iconSpan.appendChild(iconImg);
+    
+    const textSpan = document.createElement("span");
+    textSpan.className = "like-text";
+    textSpan.textContent = "좋아요";
+    
+    likeButton.appendChild(iconSpan);
+    likeButton.appendChild(textSpan);
     
     let isLiked = post.isLiked || false;
     let likeCount = post.likeCount || 0;
@@ -247,10 +261,13 @@ export default function PostDetailPage(postIdFromRoute) {
           
           // 버튼 UI 업데이트
           likeButton.className = `like-button ${isLiked ? "liked" : ""}`;
-          likeButton.innerHTML = `
-            <span class="like-icon">${isLiked ? "❤️" : "🤍"}</span>
-            <span class="like-text">좋아요</span>
-          `;
+          const iconImg = likeButton.querySelector(".like-icon img");
+          if (iconImg) {
+            iconImg.src = isLiked 
+              ? "/assets/images/bball.png" 
+              : "/assets/images/rim.png";
+            iconImg.alt = isLiked ? "좋아요 활성화" : "좋아요";
+          }
           
           // 통계 업데이트
           const likeCountElement = stats.querySelector(".like-count");
@@ -436,15 +453,19 @@ export default function PostDetailPage(postIdFromRoute) {
     commentInputBox = document.createElement("div");
     commentInputBox.className = "comment-input-box";
 
+    const textareaWrapper = document.createElement("div");
+    textareaWrapper.className = "textarea-wrapper";
+    
     const textarea = document.createElement("textarea");
     textarea.placeholder = "댓글을 남겨주세요!";
+    textareaWrapper.appendChild(textarea);
 
     // 댓글 등록 버튼
     const submitBtn = new Button({
       text: "댓글 등록",
       className: "primary",
-      width: "120px",
-      height: "44px",
+      width: "100px",
+      height: "36px",
       onClick: async () => {
         const content = textarea.value.trim();
         if (!content) {
@@ -480,7 +501,12 @@ export default function PostDetailPage(postIdFromRoute) {
         }
       },
     }).render();
-    commentInputBox.append(textarea, submitBtn);
+    
+    const buttonWrapper = document.createElement("div");
+    buttonWrapper.className = "button-wrapper";
+    buttonWrapper.appendChild(submitBtn);
+    
+    commentInputBox.append(textareaWrapper, buttonWrapper);
     return commentInputBox;
   };
 

@@ -10,13 +10,32 @@ export default function PostListPage() {
   const introSection = document.createElement("div");
   introSection.className = "intro-section";
 
-  const introText = document.createElement("p");
-  introText.innerHTML = `
-    안녕하세요,<br />
-    아무 말 대잔치 <strong>게시판</strong> 입니다.
-  `;
+  // 농구 아이콘과 텍스트를 함께 배치
+  const icon0 = document.createElement("span");
+  icon0.className = "intro-icon";
+  icon0.textContent = "⛹️‍♂️";
 
+  const icon1 = document.createElement("span");
+  icon1.className = "intro-icon";
+  icon1.textContent = "🏀";
+
+  const introText = document.createElement("p");
+  introText.className = "intro-text";
+  introText.textContent = "공 하나로 통하는 우리들의 이야기";
+
+  const icon2 = document.createElement("span");
+  icon2.className = "intro-icon";
+  icon2.textContent = "👟";
+
+  const icon3 = document.createElement("span");
+  icon3.className = "intro-icon";
+  icon3.textContent = "🏆";
+
+  introSection.appendChild(icon0);
+  introSection.appendChild(icon1);
   introSection.appendChild(introText);
+  introSection.appendChild(icon2);
+  introSection.appendChild(icon3);
   container.appendChild(introSection);
 
   // 게시글 작성 버튼 (오른쪽 정렬)

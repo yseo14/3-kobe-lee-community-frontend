@@ -7,7 +7,7 @@
   max-width: 400px;
   margin: 0 auto;
   font-family: "Pretendard", sans-serif;
-  background-color: #f6f6f8;
+  background-color: #F5F5F5;
 }
 
 .edit-profile-container h1 {
@@ -83,9 +83,37 @@
   background-color: #fff;
 }
 
-.input-section input:read-only {
-  background-color: #f0f0f0;
-  color: #777;
+/* 이메일 표시 섹션 (읽기 전용) */
+.email-display-section {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.email-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #666;
+}
+
+.email-value {
+  width: 100%;
+  padding: 12px 14px;
+  background-color: #F5F5F5;
+  border: 1px solid #D0D0D0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+  box-sizing: border-box;
+}
+
+.email-helper {
+  font-size: 12px;
+  color: #888;
+  margin-top: 6px;
+  margin-bottom: 0;
+  font-weight: 400;
 }
 
 .helper-text {
@@ -118,21 +146,21 @@
 
 /* 수정하기 버튼 */
 .button-section .btn-primary {
-  background-color: #a78bfa;
+  background-color: #A04050;
   color: white;
 }
 
 .button-section .btn-primary:hover {
-  background-color: #8b6def;
+  background-color: #8B2D3D;
 }
 
 /* 회원 탈퇴 버튼 */
 .button-section .btn-outline {
   background-color: white;
-  border: 1px solid #a78bfa;
-  color: #a78bfa;
+  border: 1px solid #2C5F8D;
+    color: #2C5F8D;
 }
 
 .button-section .btn-outline:hover {
-  background-color: #f1ebff;
+  background-color: #E8F0F8;
 }
