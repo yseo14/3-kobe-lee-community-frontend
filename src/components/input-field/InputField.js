@@ -48,6 +48,12 @@ export default class InputField {
     if (this.type !== "textarea") inputEl.type = this.type;
     inputEl.style.width = this.width;
     if (this.height) inputEl.style.height = this.height;
+    
+    // textarea의 배경색을 명시적으로 설정
+    if (this.type === "textarea") {
+      inputEl.style.backgroundColor = "#FFFFFF";
+      inputEl.style.background = "#FFFFFF";
+    }
 
     const helperEl = document.createElement("p");
     helperEl.className = "helper-text";

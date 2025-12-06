@@ -4,7 +4,11 @@ html, body {
   overflow: hidden; /* ✅ 전역 스크롤 제거 */
   margin: 0;
   padding: 0;
-  background-color: #F5F5F5;
+  background-image: url('/assets/images/bg_locker_room.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   font-family: "Pretendard", sans-serif;
 }
 
@@ -26,4 +30,29 @@ html, body {
   padding-bottom: 56px; /* footer 높이 보정 */
   box-sizing: border-box;
   overflow: hidden; /* ✅ content 자체도 스크롤 불가 */
+  background-image: url('/assets/images/bg_locker_room.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: relative;
+}
+
+/* 배경 이미지 위 회색 반투명 오버레이 */
+#content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(128, 128, 128, 0.35);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* content 내부 요소들이 오버레이 위에 표시되도록 */
+#content > * {
+  position: relative;
+  z-index: 1;
 }
