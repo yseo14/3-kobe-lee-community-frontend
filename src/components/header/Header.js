@@ -2,6 +2,8 @@ import Button from "/src/components/button/Button.js";
 import { navigate } from "/src/main.js";
 import { getMyInfo } from "/src/api/memberApi.js";
 import { getS3ImageUrl } from "/src/config/appConfig.js";
+import { logout } from "/src/api/authApi.js";
+import { showToast } from "/src/utils/showToast.js";
 
 export default function Header({
   title,
@@ -69,6 +71,12 @@ export default function Header({
 
   // 사용자 정보를 가져와서 프로필 이미지 업데이트
   (async () => {
+    // accessToken이 없으면 (로그아웃 상태) 프로필 정보를 가져오지 않음
+    const token = sessionStorage.getItem("accessToken");
+    if (!token) {
+      return;
+    }
+
     try {
       const { ok, data } = await getMyInfo();
       if (ok && data.isSuccess && data.result) {
@@ -83,6 +91,10 @@ export default function Header({
         }
       }
     } catch (err) {
+      // 401 에러는 로그아웃 상태에서 정상적인 동작이므로 조용히 처리
+      if (err.message && err.message.includes("세션이 만료")) {
+        return;
+      }
       console.error("프로필 이미지 로드 실패:", err);
       // 에러 발생 시 기본 이미지 유지
     }
@@ -106,15 +118,31 @@ export default function Header({
     navigate("/password-change");
   };
 
-  const logout = document.createElement("button");
-  logout.textContent = "로그아웃";
-  logout.onclick = () => {
+  const logoutButton = document.createElement("button");
+  logoutButton.textContent = "로그아웃";
+  logoutButton.onclick = async () => {
     dropdown.classList.remove("show");
-    sessionStorage.clear();
-    navigate("/login");
+    
+    try {
+      const { ok, data } = await logout();
+      
+      if (!ok || !data.isSuccess) {
+        showToast(data.message || "로그아웃 실패");
+        return;
+      }
+      
+      sessionStorage.clear();
+      showToast("로그아웃되었습니다.");
+      navigate("/login");
+    } catch (err) {
+      console.error("로그아웃 요청 실패:", err);
+      // 에러가 발생해도 로컬 세션은 정리하고 로그인 페이지로 이동
+      sessionStorage.clear();
+      navigate("/login");
+    }
   };
 
-  dropdown.append(editProfile, changePassword, logout);
+  dropdown.append(editProfile, changePassword, logoutButton);
 
   // 외부 클릭 시 드롭다운 닫기
   document.addEventListener("click", (e) => {
@@ -141,6 +169,12 @@ export default function Header({
 
   // 프로필 이미지를 새로고침하는 메서드
   header.refreshProfileImage = async () => {
+    // accessToken이 없으면 (로그아웃 상태) 프로필 정보를 가져오지 않음
+    const token = sessionStorage.getItem("accessToken");
+    if (!token) {
+      return;
+    }
+
     try {
       const { ok, data } = await getMyInfo();
       if (ok && data.isSuccess && data.result) {
@@ -158,6 +192,10 @@ export default function Header({
         }
       }
     } catch (err) {
+      // 401 에러는 로그아웃 상태에서 정상적인 동작이므로 조용히 처리
+      if (err.message && err.message.includes("세션이 만료")) {
+        return;
+      }
       console.error("프로필 이미지 새로고침 실패:", err);
     }
   };

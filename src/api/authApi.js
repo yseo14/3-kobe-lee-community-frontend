@@ -6,3 +6,9 @@ export function login(body) {
     body: JSON.stringify(body),
   });
 }
+
+export function logout() {
+  return apiRequest("/auth", {
+    method: "DELETE",
+  });
+}
