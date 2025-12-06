@@ -1,5 +1,7 @@
 import Button from "/src/components/button/Button.js";
 import { navigate } from "/src/main.js";
+import { getMyInfo } from "/src/api/memberApi.js";
+import { getS3ImageUrl } from "/src/config/appConfig.js";
 
 export default function Header({
   title,
@@ -44,8 +46,11 @@ export default function Header({
   const profileContainer = document.createElement("div");
   profileContainer.className = "profile-container";
 
+  // 프로필 이미지 URL (기본값)
+  let profileImageUrl = "/assets/images/default_profile.png";
+
   const profileButton = new Button({
-    icon: "/assets/images/default_profile.png", // todo: 현재는 정적 이미지. 이미지 처리 기능 구현 시 수정 필요
+    icon: profileImageUrl,
     className: "icon",
     ariaLabel: "프로필",
     onClick: (e) => {
@@ -53,6 +58,35 @@ export default function Header({
       dropdown.classList.toggle("show");
     },
   }).render();
+
+  // 프로필 이미지 업데이트 함수
+  const updateProfileImage = (imageUrl) => {
+    const img = profileButton.querySelector("img");
+    if (img && imageUrl) {
+      img.src = imageUrl;
+    }
+  };
+
+  // 사용자 정보를 가져와서 프로필 이미지 업데이트
+  (async () => {
+    try {
+      const { ok, data } = await getMyInfo();
+      if (ok && data.isSuccess && data.result) {
+        const userData = data.result;
+        
+        // profileImageKey가 있는 경우 S3 이미지 URL 구성
+        if (userData.profileImageKey) {
+          const userProfileImageUrl = getS3ImageUrl(userData.profileImageKey);
+          if (userProfileImageUrl) {
+            updateProfileImage(userProfileImageUrl);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("프로필 이미지 로드 실패:", err);
+      // 에러 발생 시 기본 이미지 유지
+    }
+  })();
 
   // 드롭다운 메뉴 생성
   const dropdown = document.createElement("div");
@@ -103,6 +137,29 @@ export default function Header({
     // 조건에 따라 뒤로가기, 프로필 버튼 노출 여부 변경
     backButton.style.display = showBack ? "flex" : "none";
     right.style.display = showProfile ? "flex" : "none";
+  };
+
+  // 프로필 이미지를 새로고침하는 메서드
+  header.refreshProfileImage = async () => {
+    try {
+      const { ok, data } = await getMyInfo();
+      if (ok && data.isSuccess && data.result) {
+        const userData = data.result;
+        
+        // profileImageKey가 있는 경우 S3 이미지 URL 구성
+        if (userData.profileImageKey) {
+          const userProfileImageUrl = getS3ImageUrl(userData.profileImageKey);
+          if (userProfileImageUrl) {
+            updateProfileImage(userProfileImageUrl);
+          }
+        } else {
+          // 프로필 이미지가 없으면 기본 이미지로 변경
+          updateProfileImage("/assets/images/default_profile.png");
+        }
+      }
+    } catch (err) {
+      console.error("프로필 이미지 새로고침 실패:", err);
+    }
   };
 
   // 초기 상태 설정

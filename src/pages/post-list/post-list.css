@@ -126,3 +126,11 @@
     background-color: #ddd;
     border-radius: 50%;
 }
+
+.profile-image {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}

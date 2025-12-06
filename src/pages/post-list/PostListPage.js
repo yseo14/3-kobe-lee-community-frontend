@@ -1,6 +1,7 @@
 import Button from "/src/components/button/Button.js";
 import { navigate } from "/src/main.js";
 import { fetchPosts } from "/src/api/postApi.js";
+import { getS3ImageUrl } from "/src/config/appConfig.js";
 
 export default function PostListPage() {
   const container = document.createElement("div");
@@ -99,8 +100,14 @@ export default function PostListPage() {
       const authorRow = document.createElement("div");
       authorRow.className = "post-author";
 
-      const profile = document.createElement("div");
-      profile.className = "profile-placeholder";
+      const profile = document.createElement("img");
+      profile.className = "profile-image";
+      if (post.profileImageKey) {
+        profile.src = getS3ImageUrl(post.profileImageKey);
+      } else {
+        profile.src = "/assets/images/default_profile.png";
+      }
+      profile.alt = "프로필 이미지";
 
       const authorName = document.createElement("span");
       authorName.textContent = post.nickname;

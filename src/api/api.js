@@ -1,4 +1,4 @@
-import { BASE_URL } from "/src/config/apiConfig.js";
+import { BASE_URL } from "/src/config/appConfig.js";
 
 export async function apiRequest(endpoint, options = {}) {
   const normalizedEndpoint = endpoint.startsWith("/api")

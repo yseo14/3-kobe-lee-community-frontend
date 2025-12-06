@@ -1,9 +1,10 @@
 import InputField from "/src/components/input-field/InputField.js";
 import ProfileUpload from "/src/components/profile-upload/ProfileUpload.js";
 import Button from "/src/components/button/Button.js";
-import { navigate } from "/src/main.js";
+import { navigate, header } from "/src/main.js";
 import { getMyInfo, updateMember, deleteMember } from "/src/api/memberApi.js";
 import { showToast } from "/src/utils/showToast.js";
+import { getS3ImageUrl } from "/src/config/appConfig.js";
 
 export default function EditProfilePage(userData) {
   const container = document.createElement("div");
@@ -40,9 +41,15 @@ export default function EditProfilePage(userData) {
   })();
 
   function renderForm(userData) {
+    // 현재 프로필 이미지 URL 생성
+    const currentProfileImageUrl = userData?.profileImageKey
+      ? getS3ImageUrl(userData.profileImageKey)
+      : null;
+
     // 프로필 업로드
     const profileUpload = new ProfileUpload({
       helperText: "*프로필 사진을 선택하세요",
+      currentImageUrl: currentProfileImageUrl,
     });
     container.appendChild(profileUpload.render());
     // 이메일 (읽기 전용)
@@ -93,15 +100,27 @@ export default function EditProfilePage(userData) {
         }
 
         try {
-          const { ok, data } = await updateMember({
+          // 프로필 이미지 objectKey 가져오기
+          const objectKey = profileUpload.getObjectKey();
+          console.log("[EditProfilePage] 가져온 objectKey:", objectKey);
+
+          const updateData = {
             nickname,
-            imageId: null, // 나중에 업로드 기능 연결
-          });
+            ...(objectKey && { profileImageObjectKey: objectKey }), // objectKey가 있으면 포함
+          };
+          console.log("[EditProfilePage] 회원정보 수정 요청 데이터:", updateData);
+
+          const { ok, data } = await updateMember(updateData);
 
           if (!ok || !data.isSuccess) {
             message.textContent = data.message || "회원정보 수정 실패";
             message.style.color = "red";
             return;
+          }
+
+          // 프로필 이미지가 변경된 경우 Header의 프로필 이미지 새로고침
+          if (objectKey && header && header.refreshProfileImage) {
+            await header.refreshProfileImage();
           }
 
           showToast("회원정보가 수정되었습니다");

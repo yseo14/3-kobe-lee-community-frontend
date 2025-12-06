@@ -119,4 +119,4 @@ window.addEventListener("load", handleRouting);
 //  이후 url의 해시(# 뒷부분)이 바뀔 때마다 실행
 window.addEventListener("hashchange", handleRouting);
 
-export { renderPage };
+export { renderPage, header };

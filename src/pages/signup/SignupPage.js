@@ -151,13 +151,21 @@ export default function SignupPage() {
         return;
       }
 
+      // 프로필 이미지 objectKey 가져오기
+      const objectKey = profileUpload.getObjectKey();
+      console.log("[SignUpPage] 가져온 objectKey:", objectKey);
+
+      const signUpData = {
+        email,
+        nickname,
+        password,
+        confirmPassword,
+        ...(objectKey && { profileImageObjectKey: objectKey }), // objectKey가 있으면 포함
+      };
+      console.log("[SignUpPage] 회원가입 요청 데이터:", signUpData);
+
       try {
-        const { ok, data } = await signUp({
-          email,
-          nickname,
-          password,
-          confirmPassword,
-        });
+        const { ok, data } = await signUp(signUpData);
 
         if (!ok) {
           showToast(data.message || "서버 오류가 발생했습니다.");
