@@ -45,6 +45,11 @@ function renderPage(pageComponent, headerOptions = {}) {
     ...headerOptions,
   });
 
+  // 프로필이 표시되는 페이지로 전환할 때 프로필 이미지 새로고침
+  if (headerOptions.showProfile) {
+    header.refreshProfileImage();
+  }
+
   content.innerHTML = ""; //  기존의 content 영역 내 페이지 제거
   content.appendChild(pageComponent()); //  새로운 페이지로 전환
 }
