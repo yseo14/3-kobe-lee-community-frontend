@@ -205,6 +205,60 @@ export default function PostListPage() {
 
   observer.observe(sentinel);
 
+  // 정렬 토글 섹션
+  const sortSection = document.createElement("div");
+  sortSection.className = "sort-section";
+
+  const sortOptions = [
+    { value: "createdAt", label: "최신순" },
+    { value: "likes", label: "좋아요순" },
+    { value: "comments", label: "댓글순" },
+    { value: "views", label: "조회수순" },
+  ];
+
+  sortOptions.forEach((option) => {
+    const sortButton = document.createElement("button");
+    sortButton.className = "sort-button";
+    sortButton.textContent = option.label;
+    sortButton.dataset.sort = option.value;
+
+    if (option.value === sortType) {
+      sortButton.classList.add("active");
+    }
+
+    sortButton.addEventListener("click", () => {
+      // 활성화 상태 변경
+      sortSection.querySelectorAll(".sort-button").forEach((btn) => {
+        btn.classList.remove("active");
+      });
+      sortButton.classList.add("active");
+
+      // 정렬 타입 변경
+      sortType = option.value;
+
+      // 게시글 목록 초기화
+      postList.innerHTML = "";
+      postList.appendChild(sentinel);
+
+      // 커서 초기화
+      cursorId = null;
+      cursorValue = null;
+      isLastPage = false;
+
+      // 옵저버 재연결
+      observer.disconnect();
+      observer.observe(sentinel);
+
+      // 첫 페이지 다시 로드
+      loadPosts();
+    });
+
+    sortSection.appendChild(sortButton);
+  });
+
+  // 정렬 섹션을 intro 섹션과 버튼 섹션 사이에 삽입
+  container.insertBefore(sortSection, buttonSection);
+
   // 첫 로드
   loadPosts();
 

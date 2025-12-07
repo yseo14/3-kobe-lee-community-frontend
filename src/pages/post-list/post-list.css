@@ -75,6 +75,49 @@
     }
 }
 
+/* ===== 정렬 토글 섹션 ===== */
+.sort-section {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 580px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
+
+.sort-button {
+    padding: 8px 16px;
+    border: 1.5px solid #D0D0D0;
+    border-radius: 20px;
+    background-color: #FFFFFF;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: "Pretendard", sans-serif;
+}
+
+.sort-button:hover {
+    border-color: #2C2C2C;
+    color: #1A1A1A;
+    background-color: #F8F8F8;
+}
+
+.sort-button.active {
+    background-color: #2C2C2C;
+    color: #FFFFFF;
+    border-color: #2C2C2C;
+    font-weight: 600;
+}
+
+.sort-button.active:hover {
+    background-color: #1A1A1A;
+    border-color: #1A1A1A;
+}
+
 /* ===== 게시글 작성 버튼 영역 ===== */
 .post-write-section {
     display: flex;
