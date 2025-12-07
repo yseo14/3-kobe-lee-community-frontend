@@ -12,6 +12,11 @@ Locker Room: 농구인들을 위한 오프 코트(Off-Court) 커뮤니티 <p>
 - **컨테이너화**: Docker
 - **테스트**: Jest
 
+## 🔗 Backend Repo
+- <a href="https://github.com/yseo14/3-kobe-lee-community-backend?tab=readme-ov-file">Github-Backend</a>
+
+## 🎥 시연 영상
+- <a href="https://drive.google.com/file/d/1RWTzd4tt3XtcALIfXVYcoBXL1g9irdBO/view?usp=drive_link">구글 드라이브</a>
 
 ## ✨ 주요 기능
 
