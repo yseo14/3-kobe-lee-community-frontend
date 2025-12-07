@@ -4,6 +4,7 @@ import { getMyInfo } from "/src/api/memberApi.js";
 import { getS3ImageUrl } from "/src/config/appConfig.js";
 import { logout } from "/src/api/authApi.js";
 import { showToast } from "/src/utils/showToast.js";
+import Modal from "/src/components/modal/Modal.js";
 
 export default function Header({
   title,
@@ -120,26 +121,40 @@ export default function Header({
 
   const logoutButton = document.createElement("button");
   logoutButton.textContent = "로그아웃";
-  logoutButton.onclick = async () => {
+  logoutButton.onclick = () => {
     dropdown.classList.remove("show");
     
-    try {
-      const { ok, data } = await logout();
-      
-      if (!ok || !data.isSuccess) {
-        showToast(data.message || "로그아웃 실패");
-        return;
-      }
-      
-      sessionStorage.clear();
-      showToast("로그아웃되었습니다.");
-      navigate("/login");
-    } catch (err) {
-      console.error("로그아웃 요청 실패:", err);
-      // 에러가 발생해도 로컬 세션은 정리하고 로그인 페이지로 이동
-      sessionStorage.clear();
-      navigate("/login");
-    }
+    // 로그아웃 확인 모달 표시
+    const logoutModal = new Modal({
+      title: "로그아웃",
+      message: "정말 로그아웃하시겠습니까?",
+      confirmText: "로그아웃",
+      cancelText: "취소",
+      onConfirm: async () => {
+        try {
+          const { ok, data } = await logout();
+          
+          if (!ok || !data.isSuccess) {
+            showToast(data.message || "로그아웃 실패");
+            return;
+          }
+          
+          sessionStorage.clear();
+          showToast("로그아웃되었습니다.");
+          navigate("/login");
+        } catch (err) {
+          console.error("로그아웃 요청 실패:", err);
+          // 에러가 발생해도 로컬 세션은 정리하고 로그인 페이지로 이동
+          sessionStorage.clear();
+          navigate("/login");
+        }
+      },
+      onCancel: () => {
+        // 취소 시 아무 동작 없음
+      },
+    });
+    
+    logoutModal.open();
   };
 
   dropdown.append(editProfile, changePassword, logoutButton);

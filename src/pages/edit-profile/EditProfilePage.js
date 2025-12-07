@@ -1,6 +1,7 @@
 import InputField from "/src/components/input-field/InputField.js";
 import ProfileUpload from "/src/components/profile-upload/ProfileUpload.js";
 import Button from "/src/components/button/Button.js";
+import Modal from "/src/components/modal/Modal.js";
 import { navigate, header } from "/src/main.js";
 import { getMyInfo, updateMember, deleteMember } from "/src/api/memberApi.js";
 import { showToast } from "/src/utils/showToast.js";
@@ -152,22 +153,34 @@ export default function EditProfilePage(userData) {
       text: "회원 탈퇴",
       className: "text",
       width: "auto",
-      onClick: async () => {
-        if (!confirm("정말 탈퇴하시겠습니까?")) return;
+      onClick: () => {
+        // 회원 탈퇴 확인 모달 표시
+        const deleteModal = new Modal({
+          title: "회원 탈퇴",
+          message: "정말 탈퇴하시겠습니까? 탈퇴한 계정은 복구할 수 없습니다.",
+          confirmText: "탈퇴하기",
+          cancelText: "취소",
+          onConfirm: async () => {
+            try {
+              const { ok, data } = await deleteMember();
 
-        try {
-          const { ok, data } = await deleteMember();
+              if (!ok || !data.isSuccess) {
+                showToast(data.message || "회원 탈퇴 실패");
+                return;
+              }
 
-          if (!ok || !data.isSuccess) {
-            alert(data.message || "회원 탈퇴 실패");
-            return;
-          }
+              showToast("회원 탈퇴가 완료되었습니다.");
+              navigate("/signup");
+            } catch (err) {
+              showToast("서버와 연결할 수 없습니다.");
+            }
+          },
+          onCancel: () => {
+            // 취소 시 아무 동작 없음
+          },
+        });
 
-          alert("회원 탈퇴가 완료되었습니다.");
-          navigate("/signup");
-        } catch (err) {
-          alert("서버와 연결할 수 없습니다.");
-        }
+        deleteModal.open();
       },
     });
     container.appendChild(deleteButton.render());
