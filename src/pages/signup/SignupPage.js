@@ -146,6 +146,13 @@ export default function SignupPage() {
         return;
       }
 
+      // 이메일 형식 검증
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showToast("올바른 이메일 주소 형식을 입력해주세요.");
+        return;
+      }
+
       if (password !== confirmPassword) {
         showToast("비밀번호가 일치하지 않습니다.");
         return;
