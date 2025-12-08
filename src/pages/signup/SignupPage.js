@@ -153,8 +153,59 @@ export default function SignupPage() {
         return;
       }
 
+      // 이메일 중복 검증
+      try {
+        const { ok, data } = await checkEmailDuplicate(email);
+        if (ok && data.isSuccess) {
+          if (!data.result.available) {
+            showToast("이미 사용 중인 이메일입니다.");
+            return;
+          }
+        } else {
+          showToast(data?.message || "이메일 중복 확인 실패");
+          return;
+        }
+      } catch (err) {
+        console.error("이메일 중복 확인 실패:", err);
+        showToast("서버 오류로 이메일 확인에 실패했습니다.");
+        return;
+      }
+
+      // 비밀번호 형식 검증
+      const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
+      if (!passwordRegex.test(password)) {
+        showToast("올바른 비밀번호 형식을 입력해주세요.");
+        return;
+      }
+
+      // 비밀번호 확인 불일치 검증
       if (password !== confirmPassword) {
         showToast("비밀번호가 일치하지 않습니다.");
+        return;
+      }
+
+      // 닉네임 형식 검증 (한글, 영문, 숫자만 허용, 2-20자)
+      const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,20}$/;
+      if (!nicknameRegex.test(nickname)) {
+        showToast("닉네임은 한글, 영문, 숫자만 사용 가능하며 2-20자여야 합니다.");
+        return;
+      }
+
+      // 닉네임 중복 검증
+      try {
+        const { ok, data } = await checkNicknameDuplicate(nickname);
+        if (ok && data.isSuccess) {
+          if (!data.result.available) {
+            showToast("이미 사용 중인 닉네임입니다.");
+            return;
+          }
+        } else {
+          showToast(data?.message || "닉네임 중복 확인 실패");
+          return;
+        }
+      } catch (err) {
+        console.error("닉네임 중복 확인 실패:", err);
+        showToast("서버 오류로 닉네임 확인에 실패했습니다.");
         return;
       }
 
