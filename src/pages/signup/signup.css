@@ -8,7 +8,7 @@
     margin-left: auto;
     margin-right: auto;
     background-color: rgba(255, 255, 255, 1);
-    padding: 40px;
+    padding: 24px 20px;
     border-radius: 16px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(224, 224, 224, 0.9);
@@ -16,18 +16,189 @@
 }
 
 .signup-container h1 {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     text-align: center;
 }
 
 .profile-upload-component {
     width: 100%;
-    margin: 0 auto 20px;
+    margin: 0 auto 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+@media (max-width: 768px) {
+    .signup-container {
+        max-width: 90%;
+        padding: 20px 16px;
+    }
+
+    .signup-container h1 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    .profile-upload-component {
+        margin-bottom: 10px;
+    }
+
+    .profile-upload-area {
+        width: 100px !important;
+        height: 100px !important;
+    }
+
+    .plus-icon {
+        font-size: 28px !important;
+    }
+
+    .signup-container .input-field-component {
+        margin-bottom: 10px;
+    }
+
+    .signup-button {
+        height: 38px;
+        font-size: 13px;
+        margin-top: 8px;
+    }
+
+    .go-login {
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .email-check-button {
+        font-size: 11px;
+        padding: 4px 6px;
+        right: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .signup-container {
+        max-width: 95%;
+        padding: 14px 12px;
+        border-radius: 12px;
+    }
+
+    .signup-container h1 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .profile-upload-component {
+        margin-bottom: 8px;
+    }
+
+    .profile-upload-area {
+        width: 85px !important;
+        height: 85px !important;
+    }
+
+    .plus-icon {
+        font-size: 24px !important;
+    }
+
+    .signup-container .input-field-component {
+        margin-bottom: 8px;
+    }
+
+    .email-check-button {
+        font-size: 10px;
+        padding: 3px 5px;
+        right: 5px;
+    }
+
+    .signup-button {
+        height: 36px;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .go-login {
+        font-size: 11px;
+        margin-top: 5px;
+    }
+}
+
+@media (max-height: 700px) {
+    .signup-container {
+        padding: 16px 14px;
+    }
+
+    .signup-container h1 {
+        font-size: 17px;
+        margin-bottom: 10px;
+    }
+
+    .profile-upload-component {
+        margin-bottom: 8px;
+    }
+
+    .profile-upload-area {
+        width: 90px !important;
+        height: 90px !important;
+    }
+
+    .plus-icon {
+        font-size: 26px !important;
+    }
+
+    .signup-container .input-field-component {
+        margin-bottom: 8px;
+    }
+
+    .signup-button {
+        height: 36px;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .go-login {
+        font-size: 11px;
+        margin-top: 5px;
+    }
+}
+
+@media (max-height: 600px) {
+    .signup-container {
+        padding: 12px 10px;
+    }
+
+    .signup-container h1 {
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+
+    .profile-upload-component {
+        margin-bottom: 6px;
+    }
+
+    .profile-upload-area {
+        width: 75px !important;
+        height: 75px !important;
+    }
+
+    .plus-icon {
+        font-size: 20px !important;
+    }
+
+    .signup-container .input-field-component {
+        margin-bottom: 6px;
+    }
+
+    .signup-button {
+        height: 34px;
+        font-size: 11px;
+        margin-top: 5px;
+    }
+
+    .go-login {
+        font-size: 10px;
+        margin-top: 4px;
+    }
 }
 
 
@@ -58,10 +229,11 @@
     font-weight: 600;
     border: none;
     border-radius: 10px;
-    height: 48px;
-    margin-top: 12px;
+    height: 40px;
+    margin-top: 8px;
     cursor: pointer;
     transition: background-color 0.2s;
+    font-size: 14px;
 }
 
 .signup-button:hover {
@@ -69,9 +241,9 @@
 }
 
 .go-login {
-    font-size: 14px;
+    font-size: 13px;
     color: #333;
-    margin-top: 12px;
+    margin-top: 8px;
     text-decoration: underline;
     cursor: pointer;
 }

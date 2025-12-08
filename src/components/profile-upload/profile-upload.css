@@ -3,17 +3,17 @@
     flex-direction: column;
     align-items: flex-start;
     font-family: 'Pretendard', sans-serif;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     width: 320px;
 }
 
 .input-label {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .helper-text {
-    font-size: 12px;
+    font-size: 11px;
     color: #e74c3c;
     height: 0.8em;
     margin-top: 2px;
@@ -28,8 +28,8 @@
 }
 
 .profile-upload-area {
-    width: 140px;
-    height: 140px;
+    width: 110px;
+    height: 110px;
     margin: 0 auto;
     background-color: #c9c9c9;
     border-radius: 50%;
@@ -47,7 +47,7 @@
 }
 
 .plus-icon {
-    font-size: 40px;
+    font-size: 32px;
     color: #333;
     user-select: none;
 }
@@ -79,7 +79,101 @@
 }
 
 .edit-icon {
-    font-size: 32px;
+    font-size: 26px;
     color: white;
     user-select: none;
+}
+
+@media (max-width: 768px) {
+    .profile-upload-component {
+        width: 100%;
+        max-width: 320px;
+        margin-bottom: 10px;
+    }
+
+    .input-label {
+        font-size: 12px;
+    }
+
+    .profile-upload-area {
+        width: 100px;
+        height: 100px;
+    }
+
+    .plus-icon {
+        font-size: 28px;
+    }
+
+    .edit-icon {
+        font-size: 24px;
+    }
+
+    .helper-text {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-upload-component {
+        margin-bottom: 8px;
+    }
+
+    .input-label {
+        font-size: 11px;
+    }
+
+    .profile-upload-area {
+        width: 85px;
+        height: 85px;
+    }
+
+    .plus-icon {
+        font-size: 24px;
+    }
+
+    .edit-icon {
+        font-size: 20px;
+    }
+
+    .helper-text {
+        font-size: 9px;
+    }
+}
+
+@media (max-height: 700px) {
+    .profile-upload-component {
+        margin-bottom: 8px;
+    }
+
+    .profile-upload-area {
+        width: 90px;
+        height: 90px;
+    }
+
+    .plus-icon {
+        font-size: 26px;
+    }
+
+    .edit-icon {
+        font-size: 22px;
+    }
+}
+
+@media (max-height: 600px) {
+    .profile-upload-component {
+        margin-bottom: 6px;
+    }
+
+    .profile-upload-area {
+        width: 75px;
+        height: 75px;
+    }
+
+    .plus-icon {
+        font-size: 20px;
+    }
+
+    .edit-icon {
+        font-size: 18px;
+    }
 }

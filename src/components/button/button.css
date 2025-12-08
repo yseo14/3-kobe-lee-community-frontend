@@ -18,10 +18,11 @@
 .button.primary {
     background-color: #A04050;
     color: white;
-    padding: 10px 16px;
-    height: 48px;
+    padding: 9px 14px;
+    height: 40px;
     width: 100%;
     max-width: 320px;
+    font-size: 14px;
 }
 
 .button.primary:hover {
@@ -77,4 +78,113 @@
     background-color: #E8F0F8;
     border-color: #1D428A;
     color: #1D428A;
+}
+
+@media (max-width: 768px) {
+    .button {
+        font-size: 12px;
+    }
+
+    .button.primary {
+        height: 38px;
+        padding: 8px 12px;
+    }
+
+    .button.text {
+        padding: 6px 9px;
+        font-size: 12px;
+    }
+
+    .button.icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .button-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    .button.secondary-outline {
+        font-size: 11px;
+        padding: 5px 9px;
+    }
+}
+
+@media (max-width: 480px) {
+    .button {
+        font-size: 11px;
+    }
+
+    .button.primary {
+        height: 36px;
+        padding: 7px 10px;
+    }
+
+    .button.text {
+        padding: 5px 7px;
+        font-size: 11px;
+    }
+
+    .button.icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .button-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .button.secondary-outline {
+        font-size: 10px;
+        padding: 4px 7px;
+    }
+}
+
+@media (max-height: 700px) {
+    .button {
+        font-size: 11px;
+    }
+
+    .button.primary {
+        height: 36px;
+        padding: 7px 10px;
+    }
+
+    .button.text {
+        padding: 5px 7px;
+        font-size: 11px;
+    }
+}
+
+@media (max-height: 600px) {
+    .button {
+        font-size: 10px;
+    }
+
+    .button.primary {
+        height: 34px;
+        padding: 6px 9px;
+    }
+
+    .button.text {
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+
+    .button.icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .button-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .button.secondary-outline {
+        font-size: 9px;
+        padding: 3px 6px;
+    }
 }
