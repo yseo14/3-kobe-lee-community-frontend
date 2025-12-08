@@ -27,7 +27,8 @@ export async function apiRequest(endpoint, options = {}) {
     });
 
     // access token 만료 시 재발급 시도
-    if (response.status === 401) {
+    // 단, 로그인 엔드포인트(/auth POST)는 토큰이 필요 없으므로 refresh를 시도하지 않음
+    if (response.status === 401 && !(normalizedEndpoint === "/api/auth" && options.method === "POST")) {
       console.warn("Access Token이 만료되었습니다. 재발급 요청을 시도합니다.");
       const refreshed = await tryRefreshToken();
 
