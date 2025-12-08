@@ -305,6 +305,7 @@ export default function PostDetailPage(postIdFromRoute) {
   let allComments = [];
   let commentList = null;
   let commentInputBox = null;
+  let sortDropdown = null;
 
   // 댓글 아이템 렌더링 (공통 함수)
   const renderCommentItem = (c) => {
@@ -419,7 +420,7 @@ export default function PostDetailPage(postIdFromRoute) {
                 if (ok && data.isSuccess) {
                   showToast("댓글이 삭제되었습니다.");
                   const { ok: commentOk, data: commentData } = await fetchComments(postId, {
-                    sort: "createdAt",
+                    sort: sortType,
                     limit: 10,
                   });
                   if (commentOk && commentData.isSuccess) {
@@ -444,6 +445,102 @@ export default function PostDetailPage(postIdFromRoute) {
     top.append(topLeft, actions);
     item.append(top, content);
     return item;
+  };
+
+  // 정렬 드롭다운 렌더링
+  const renderSortDropdown = () => {
+    if (sortDropdown) return sortDropdown;
+
+    const dropdownWrapper = document.createElement("div");
+    dropdownWrapper.className = "comment-sort-wrapper";
+
+    const selectButton = document.createElement("button");
+    selectButton.className = "comment-sort-button";
+    selectButton.type = "button";
+    
+    const selectText = document.createElement("span");
+    selectText.className = "comment-sort-text";
+    selectText.textContent = sortType === "createdAt" ? "등록순" : "최신순";
+    
+    const selectArrow = document.createElement("span");
+    selectArrow.className = "comment-sort-arrow";
+    selectArrow.innerHTML = "▼";
+    
+    selectButton.appendChild(selectText);
+    selectButton.appendChild(selectArrow);
+
+    const dropdownMenu = document.createElement("div");
+    dropdownMenu.className = "comment-sort-menu";
+    dropdownMenu.style.display = "none";
+
+    const options = [
+      { value: "createdAt", text: "등록순" },
+      { value: "latest", text: "최신순" }
+    ];
+
+    options.forEach((option) => {
+      const menuItem = document.createElement("div");
+      menuItem.className = `comment-sort-menu-item ${sortType === option.value ? "active" : ""}`;
+      menuItem.textContent = option.text;
+      menuItem.dataset.value = option.value;
+      
+      menuItem.addEventListener("click", async () => {
+        const newSortType = option.value;
+        if (newSortType !== sortType) {
+          sortType = newSortType;
+          selectText.textContent = option.text;
+          
+          // 메뉴 아이템 활성화 상태 업데이트
+          dropdownMenu.querySelectorAll(".comment-sort-menu-item").forEach((item) => {
+            item.classList.toggle("active", item.dataset.value === newSortType);
+          });
+          
+          dropdownMenu.style.display = "none";
+          
+          // 정렬 변경 시 댓글 목록 초기화 및 재로드
+          allComments = [];
+          cursorId = null;
+          cursorCreatedAt = null;
+          isLastPage = false;
+          isLoading = false;
+          
+          // 댓글 섹션 초기화
+          commentSection.innerHTML = "";
+          commentList = null;
+          commentInputBox = null;
+          sortDropdown = null;
+          
+          // 드롭다운과 입력창 다시 렌더링
+          commentSection.append(renderSortDropdown(), renderCommentInput());
+          
+          // 댓글 다시 로드
+          loadComments();
+        } else {
+          dropdownMenu.style.display = "none";
+        }
+      });
+      
+      dropdownMenu.appendChild(menuItem);
+    });
+
+    selectButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = dropdownMenu.style.display === "block";
+      dropdownMenu.style.display = isOpen ? "none" : "block";
+    });
+
+    // 외부 클릭 시 드롭다운 닫기
+    document.addEventListener("click", (e) => {
+      if (!dropdownWrapper.contains(e.target)) {
+        dropdownMenu.style.display = "none";
+      }
+    });
+
+    dropdownWrapper.appendChild(selectButton);
+    dropdownWrapper.appendChild(dropdownMenu);
+
+    sortDropdown = dropdownWrapper;
+    return sortDropdown;
   };
 
   // 댓글 입력창 렌더링 (한 번만)
@@ -483,7 +580,7 @@ export default function PostDetailPage(postIdFromRoute) {
             const { ok: commentOk, data: commentData } = await fetchComments(
               postId,
               {
-                sort: "createdAt",
+                sort: sortType,
                 limit: 10,
               }
             );
@@ -517,13 +614,16 @@ export default function PostDetailPage(postIdFromRoute) {
       commentSection.innerHTML = "";
       commentList = document.createElement("div");
       commentList.className = "comment-list";
-      commentSection.append(renderCommentInput(), commentList);
+      commentSection.append(renderSortDropdown(), renderCommentInput(), commentList);
     }
 
     // commentList가 없으면 생성
     if (!commentList) {
       commentList = document.createElement("div");
       commentList.className = "comment-list";
+      if (!sortDropdown) {
+        commentSection.append(renderSortDropdown());
+      }
       if (!commentInputBox) {
         commentSection.append(renderCommentInput());
       }
@@ -634,6 +734,12 @@ export default function PostDetailPage(postIdFromRoute) {
       isLoading = false;
     }
   };
+
+  // 초기 댓글 섹션 설정 (드롭다운과 입력창 먼저 표시)
+  commentSection.append(renderSortDropdown(), renderCommentInput());
+  commentList = document.createElement("div");
+  commentList.className = "comment-list";
+  commentSection.append(commentList);
 
   // 스크롤 감시자
   const observer = new IntersectionObserver(
