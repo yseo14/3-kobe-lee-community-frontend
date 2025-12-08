@@ -3,7 +3,7 @@ import ProfileUpload from "/src/components/profile-upload/ProfileUpload.js";
 import Button from "/src/components/button/Button.js";
 import Modal from "/src/components/modal/Modal.js";
 import { navigate, header } from "/src/main.js";
-import { getMyInfo, updateMember, deleteMember } from "/src/api/memberApi.js";
+import { getMyInfo, updateMember, deleteMember, checkNicknameDuplicate } from "/src/api/memberApi.js";
 import { showToast } from "/src/utils/showToast.js";
 import { getS3ImageUrl } from "/src/config/appConfig.js";
 
@@ -83,6 +83,7 @@ export default function EditProfilePage(userData) {
     container.appendChild(emailSection);
 
     // 닉네임
+    const originalNickname = userData?.nickname || "";
     const nicknameField = new InputField({
       id: "nickname",
       label: "닉네임",
@@ -90,9 +91,40 @@ export default function EditProfilePage(userData) {
       placeholder: "닉네임을 입력하세요",
       required: true,
       requiredMessage: "닉네임을 입력하세요.",
+      validateFn: (value) => /^[가-힣a-zA-Z0-9]{2,20}$/.test(value),
+      invalidMessage: "닉네임은 한글, 영문, 숫자만 사용 가능하며 2-20자여야 합니다.",
+      onBlur: async (e) => {
+        const nickname = e.target.value.trim();
+        if (!nickname) return;
+
+        // 현재 닉네임과 같으면 중복 검증 스킵
+        if (nickname === originalNickname) {
+          nicknameField.hideHelper();
+          return;
+        }
+
+        try {
+          const { ok, data } = await checkNicknameDuplicate(nickname);
+
+          if (ok && data.isSuccess) {
+            if (!data.result.available) {
+              showToast("이미 사용 중인 닉네임입니다.");
+              nicknameField.showHelper("이미 등록된 닉네임이에요.");
+            } else {
+              showToast("사용 가능한 닉네임입니다.");
+              nicknameField.hideHelper();
+            }
+          } else {
+            showToast(data?.message || "닉네임 중복 확인 실패");
+          }
+        } catch (err) {
+          console.error("닉네임 중복 확인 실패:", err);
+          showToast("서버 오류로 닉네임 확인에 실패했습니다.");
+        }
+      },
     });
     const nicknameEl = nicknameField.render();
-    nicknameEl.querySelector("input").value = userData?.nickname || "";
+    nicknameEl.querySelector("input").value = originalNickname;
     container.appendChild(nicknameEl);
 
     // 상태 메시지
@@ -111,8 +143,38 @@ export default function EditProfilePage(userData) {
         const nickname = document.getElementById("nickname").value.trim();
 
         if (!nickname) {
+          showToast("닉네임을 입력하세요.");
           nicknameField.showHelper("닉네임을 입력하세요.");
           return;
+        }
+
+        // 닉네임 형식 검증 (한글, 영문, 숫자만 허용, 2-20자)
+        const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,20}$/;
+        if (!nicknameRegex.test(nickname)) {
+          showToast("닉네임은 한글, 영문, 숫자만 사용 가능하며 2-20자여야 합니다.");
+          nicknameField.showHelper("닉네임은 한글, 영문, 숫자만 사용 가능하며 2-20자여야 합니다.");
+          return;
+        }
+
+        // 닉네임이 변경된 경우에만 중복 검증
+        if (nickname !== originalNickname) {
+          try {
+            const { ok, data } = await checkNicknameDuplicate(nickname);
+            if (ok && data.isSuccess) {
+              if (!data.result.available) {
+                showToast("이미 사용 중인 닉네임입니다.");
+                nicknameField.showHelper("이미 등록된 닉네임이에요.");
+                return;
+              }
+            } else {
+              showToast(data?.message || "닉네임 중복 확인 실패");
+              return;
+            }
+          } catch (err) {
+            console.error("닉네임 중복 확인 실패:", err);
+            showToast("서버 오류로 닉네임 확인에 실패했습니다.");
+            return;
+          }
         }
 
         try {
@@ -129,6 +191,7 @@ export default function EditProfilePage(userData) {
           const { ok, data } = await updateMember(updateData);
 
           if (!ok || !data.isSuccess) {
+            showToast(data.message || "회원정보 수정 실패");
             message.textContent = data.message || "회원정보 수정 실패";
             message.style.color = "red";
             return;
@@ -141,6 +204,7 @@ export default function EditProfilePage(userData) {
 
           showToast("회원정보가 수정되었습니다");
         } catch (err) {
+          showToast(err.message || "서버와 연결할 수 없습니다.");
           message.textContent = err.message || "서버와 연결할 수 없습니다.";
           message.style.color = "red";
         }
