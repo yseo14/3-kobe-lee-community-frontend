@@ -70,36 +70,8 @@ export default function Header({
     }
   };
 
-  // 사용자 정보를 가져와서 프로필 이미지 업데이트
-  (async () => {
-    // accessToken이 없으면 (로그아웃 상태) 프로필 정보를 가져오지 않음
-    const token = sessionStorage.getItem("accessToken");
-    if (!token) {
-      return;
-    }
-
-    try {
-      const { ok, data } = await getMyInfo();
-      if (ok && data.isSuccess && data.result) {
-        const userData = data.result;
-        
-        // profileImageKey가 있는 경우 S3 이미지 URL 구성
-        if (userData.profileImageKey) {
-          const userProfileImageUrl = getS3ImageUrl(userData.profileImageKey);
-          if (userProfileImageUrl) {
-            updateProfileImage(userProfileImageUrl);
-          }
-        }
-      }
-    } catch (err) {
-      // 401 에러는 로그아웃 상태에서 정상적인 동작이므로 조용히 처리
-      if (err.message && err.message.includes("세션이 만료")) {
-        return;
-      }
-      console.error("프로필 이미지 로드 실패:", err);
-      // 에러 발생 시 기본 이미지 유지
-    }
-  })();
+  // 프로필 이미지 로딩 중복 호출 방지를 위한 플래그
+  let isProfileImageLoading = false;
 
   // 드롭다운 메뉴 생성
   const dropdown = document.createElement("div");
@@ -184,11 +156,18 @@ export default function Header({
 
   // 프로필 이미지를 새로고침하는 메서드
   header.refreshProfileImage = async () => {
+    // 이미 로딩 중이면 중복 호출 방지
+    if (isProfileImageLoading) {
+      return;
+    }
+
     // accessToken이 없으면 (로그아웃 상태) 프로필 정보를 가져오지 않음
     const token = sessionStorage.getItem("accessToken");
     if (!token) {
       return;
     }
+
+    isProfileImageLoading = true;
 
     try {
       const { ok, data } = await getMyInfo();
@@ -212,6 +191,8 @@ export default function Header({
         return;
       }
       console.error("프로필 이미지 새로고침 실패:", err);
+    } finally {
+      isProfileImageLoading = false;
     }
   };
 
